@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Enhanced Desert Theme Colors */
+    --background: 45 30% 98%;
+    --foreground: 30 15% 12%;
+    --card: 45 25% 96%;
+    --card-foreground: 30 15% 12%;
+    --popover: 45 30% 98%;
+    --popover-foreground: 30 15% 12%;
+    --primary: 35 65% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 15% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 45 20% 92%;
+    --muted-foreground: 30 15% 35%;
+    --accent: 42 45% 88%;
+    --accent-foreground: 30 15% 12%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 45 15% 85%;
+    --input: 45 20% 94%;
+    --ring: 35 65% 45%;
+
+    /* Enhanced Sand scale (warm neutrals) */
+    --sand-50: 45 30% 98%;
+    --sand-100: 45 25% 95%;
+    --sand-200: 45 20% 88%;
+    --sand-300: 45 18% 82%;
+    --sand-400: 45 15% 68%;
+    --sand-500: 45 12% 55%;
+    --sand-600: 45 15% 45%;
+    --sand-700: 45 18% 35%;
+    --sand-800: 45 20% 25%;
+    --sand-900: 45 25% 15%;
+
+    /* Enhanced Desert scale (warm earth tones) */
+    --desert-50: 35 40% 96%;
+    --desert-100: 35 35% 90%;
+    --desert-200: 35 30% 82%;
+    --desert-300: 35 28% 72%;
+    --desert-400: 35 45% 58%;
+    --desert-500: 35 65% 45%;
+    --desert-600: 35 70% 38%;
+    --desert-700: 35 75% 30%;
+    --desert-800: 35 80% 22%;
+    --desert-900: 35 85% 15%;
+
+    /* Heritage Colors */
+    --heritage-gold: 42 85% 55%;
+    --oasis-blue: 200 85% 45%;
+    --tent-black: 30 15% 12%;
+    --deep-brown: 25 35% 25%;
+    --sand-light: 45 25% 95%;
+    --sand-medium: 45 20% 88%;
+    --sand-dark: 45 18% 82%;
+    --desert-brown: 30 25% 35%;
+
+    /* Font families */
+    --font-arabic: 'Amiri', serif;
+    --font-modern-arabic: 'Tajawal', sans-serif;
+    --font-sans: 'Inter', sans-serif;
+    
+    /* Border radius */
+    --radius: 16px;
+  }
+
+  .dark {
+    --background: 32 45% 8%;
+    --foreground: 36 15% 85%;
+    --card: 32 40% 12%;
+    --card-foreground: 36 15% 85%;
+    --popover: 32 45% 8%;
+    --popover-foreground: 36 15% 85%;
+    --primary: 12 76% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 36 15% 85%;
+    --secondary-foreground: 32 25% 15%;
+    --muted: 32 30% 15%;
+    --muted-foreground: 36 15% 55%;
+    --accent: 32 40% 18%;
+    --accent-foreground: 12 76% 55%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 32 30% 20%;
+    --input: 32 35% 22%;
+    --ring: 12 76% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-modern-arabic antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.7;
+  }
+
+  /* Enhanced Typography Classes */
+  .arabic-title {
+    font-family: var(--font-arabic);
+    font-weight: 700;
+    line-height: 1.4;
+    color: hsl(var(--tent-black));
+  }
+
+  .arabic-body {
+    font-family: var(--font-modern-arabic);
+    font-weight: 400;
+    line-height: 1.8;
+    color: hsl(var(--deep-brown));
+  }
+
+  .modern-font {
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+
+  /* Heritage Card Component */
+  .heritage-card {
+    @apply bg-card border border-border rounded-2xl p-6 shadow-sm;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--sand-dark));
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+  }
+
+  .heritage-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+
+  /* Button Styles */
+  .btn-heritage {
+    @apply bg-desert-500 hover:bg-desert-600 text-white font-medium px-6 py-3 rounded-xl;
+    background: hsl(var(--heritage-gold));
+    color: hsl(var(--tent-black));
+    transition: all 0.3s ease;
+  }
+
+  .btn-heritage:hover {
+    background: hsl(var(--desert-600));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-oasis {
+    @apply bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-xl;
+    background: hsl(var(--oasis-blue));
+    transition: all 0.3s ease;
+  }
+
+  .btn-oasis:hover {
+    background: hsl(200 85% 40%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Enhanced Utility Classes */
+  .desert-gradient {
+    background: linear-gradient(135deg, hsl(var(--sand-100)) 0%, hsl(var(--sand-200)) 100%);
+  }
+
+  .heritage-gradient {
+    background: linear-gradient(135deg, hsl(var(--heritage-gold)) 0%, hsl(var(--desert-500)) 100%);
+  }
+
+  .text-shadow-soft {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-strong {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .border-heritage {
+    border-color: hsl(var(--heritage-gold));
+  }
+
+  .bg-heritage-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsl(var(--heritage-gold) / 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--desert-300) / 0.1) 0%, transparent 50%);
+  }
+
+  /* Enhanced Focus States */
+  .focus-heritage:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(var(--heritage-gold) / 0.3);
+  }
+
+  /* Improved Card Shadows */
+  .shadow-heritage {
+    box-shadow: 
+      0 4px 6px -1px rgba(139, 69, 19, 0.1),
+      0 2px 4px -1px rgba(139, 69, 19, 0.06);
+  }
+
+  .shadow-heritage-lg {
+    box-shadow: 
+      0 10px 15px -3px rgba(139, 69, 19, 0.1),
+      0 4px 6px -2px rgba(139, 69, 19, 0.05);
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-sand-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-sand-400 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-sand-500;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.8s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* RTL-aware slide animation */
+[dir="rtl"] .slide-in-right {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  @apply shadow-lg;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.focus-visible:focus {
+  @apply outline-none ring-2 ring-ring ring-offset-2;
+}
+
+/* Mobile menu animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-enter {
+  animation: slideDown 0.2s ease-out;
+}
