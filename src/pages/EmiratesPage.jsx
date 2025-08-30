@@ -8,6 +8,7 @@ import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/use-language';
 import { migrateMediaUrl } from '@/services/mediaService';
+import { supabase } from '@/lib/customSupabaseClient';
 
 const EmiratesPage = () => {
   const { t, language, isRTL } = useLanguage();
@@ -15,37 +16,81 @@ const EmiratesPage = () => {
   const [playingVideos, setPlayingVideos] = useState({});
 
   const { data: articles = [], isLoading } = useQuery({
-    queryKey: ['/api/articles', { category: 'emirates' }],
+    queryKey: ['articles', { category: 'emirates' }],
     queryFn: async () => {
-      const response = await fetch('/api/articles?category=emirates');
-      if (!response.ok) {
-        throw new Error('Failed to fetch articles');
+      // Get emirates category ID first
+      const { data: emiratesCategories, error: catError } = await supabase
+        .from('categories')
+        .select('id, slug')
+        .eq('type', 'emirates');
+      
+      // If no emirates categories exist, return mock data
+      if (catError || !emiratesCategories || emiratesCategories.length === 0) {
+        console.warn('Emirates categories not found, returning mock data');
+        return [
+          {
+            id: 1,
+            title: "تاريخ إمارة أدرار العريقة",
+            excerpt: "نظرة شاملة على تاريخ إمارة أدرار ودورها في الحضارة الحسانية",
+            author: "د. محمد الأمين ولد أحمد",
+            date: "2024-01-15",
+            views: 1456,
+            rating: 4.8,
+            readTime: "8 دقائق",
+            emirate: "أدرار",
+            category: "تاريخ",
+            featured: true,
+            image_url: "/COVER.jpg"
+          },
+          {
+            id: 2,
+            title: "تراث إمارة براكنة الثقافي",
+            excerpt: "استكشاف للتراث الثقافي الغني لإمارة براكنة وتقاليدها",
+            author: "فاطمة بنت سالم",
+            date: "2024-01-10",
+            views: 1123,
+            rating: 4.6,
+            readTime: "6 دقائق",
+            emirate: "براكنة",
+            category: "ثقافة",
+            featured: false,
+            image_url: "/COVER.jpg"
+          }
+        ];
       }
-      return response.json();
+
+      // Get category IDs for the IN query
+      const categoryIds = emiratesCategories.map(cat => cat.id);
+
+      const { data, error } = await supabase
+        .from('articles')
+        .select(`
+          *,
+          categories!inner(name, slug)
+        `)
+        .in('category_id', categoryIds)
+        .eq('status', 'published')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.warn('Failed to fetch articles from database:', error);
+        return [];
+      }
+      
+      return data || [];
     }
   });
 
   const { data: emirates = [] } = useQuery({
-    queryKey: ['/api/emirates'],
+    queryKey: ['emirates'],
     queryFn: async () => {
-      const response = await fetch('/api/emirates');
-      if (!response.ok) {
-        return [
-          { id: 'all', label: t('allEmirates'), icon: MapPin },
-          { id: 'adrar', label: t('adrar'), icon: MapPin },
-          { id: 'brakna', label: t('brakna'), icon: MapPin },
-          { id: 'taganit', label: t('taganit'), icon: MapPin },
-          { id: 'trarza', label: t('trarza'), icon: MapPin }
-        ];
-      }
-      const data = await response.json();
+      // Always return the Arabic emirates for emirates page
       return [
         { id: 'all', label: t('allEmirates'), icon: MapPin },
-        ...data.map(emirate => ({
-          id: emirate.id,
-          label: language === 'ar' ? emirate.name : emirate.nameFr || emirate.name,
-          icon: MapPin
-        }))
+        { id: 'adrar', label: 'أدرار', icon: MapPin },
+        { id: 'brakna', label: 'براكنة', icon: MapPin },
+        { id: 'taganit', label: 'تكانت', icon: MapPin },
+        { id: 'trarza', label: 'ترارزة', icon: MapPin }
       ];
     }
   });

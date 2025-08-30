@@ -307,5 +307,10 @@
   "updateNews": "تحديث الخبر",
   "updateCoverage": "تحديث التغطية",
   "updatePodcast": "تحديث البودكاست",
-  "updateProgram": "تحديث البرنامج"
+  "updateProgram": "تحديث البرنامج",
+  "allTypes": "جميع الأنواع",
+  "poetry": "الشعر",
+  "prose": "النثر",
+  "folkTales": "الحكايات الشعبية",
+  "translations": "الترجمات"
 }
