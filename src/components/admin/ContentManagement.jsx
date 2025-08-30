@@ -110,9 +110,9 @@ const ContentManagement = ({
         );
       case 'excerpt':
         return value ? (
-          <div className="max-w-xs">
-            <div className="font-semibold">{item.title}</div>
-            <div className="text-sm text-gray-600 mt-1 line-clamp-2">{value}</div>
+          <div className="max-w-xs lg:max-w-sm xl:max-w-md">
+            <div className="font-semibold text-sm lg:text-base truncate">{item.title}</div>
+            <div className="text-xs lg:text-sm text-gray-600 mt-1 line-clamp-2">{value}</div>
           </div>
         ) : item.title;
       default:
@@ -122,9 +122,9 @@ const ContentManagement = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold arabic-title text-[var(--tent-black)]">{title}</h1>
-        <Button onClick={() => setShowForm(true)} className="btn-heritage modern-font flex items-center space-x-2 space-x-reverse">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold arabic-title text-[var(--tent-black)]">{title}</h1>
+        <Button onClick={() => setShowForm(true)} className="btn-heritage modern-font flex items-center space-x-2 space-x-reverse w-full sm:w-auto">
           <PlusCircle size={20} />
           <span>إضافة جديد</span>
         </Button>
@@ -138,96 +138,177 @@ const ContentManagement = ({
         />
       )}
 
-      <div className="bg-white/80 rounded-lg shadow-md overflow-hidden border border-[var(--sand-dark)]">
-        <table className="w-full text-right">
-          <thead className="bg-[var(--sand-medium)]">
-            <tr>
-              {columns.map((column) => (
-                <th key={column.key} className="p-4 font-bold arabic-title">
-                  {column.label}
-                </th>
-              ))}
-              <th className="p-4 font-bold arabic-title">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white/80 rounded-lg shadow-md overflow-hidden border border-[var(--sand-dark)]">
+        <div className="overflow-x-auto">
+          <table className="w-full text-right min-w-[800px]">
+            <thead className="bg-[var(--sand-medium)]">
               <tr>
-                <td colSpan={columns.length + 1} className="text-center p-8 modern-font">
-                  جاري التحميل...
-                </td>
+                {columns.map((column) => (
+                  <th key={column.key} className="p-3 lg:p-4 font-bold arabic-title text-sm lg:text-base whitespace-nowrap">
+                    {column.label}
+                  </th>
+                ))}
+                <th className="p-3 lg:p-4 font-bold arabic-title text-sm lg:text-base">الإجراءات</th>
               </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length + 1} className="text-center p-8 modern-font">
-                  لا توجد عناصر
-                </td>
-              </tr>
-            ) : (
-              items.map(item => (
-                <tr key={item.id} className="border-b border-[var(--sand-dark)] last:border-b-0 hover:bg-sand-light/50">
-                  {columns.map((column) => (
-                    <td key={column.key} className="p-4 arabic-body">
-                      {renderCellContent(item, column)}
-                    </td>
-                  ))}
-                  <td className="p-4 modern-font">
-                    <div className="flex space-x-2 space-x-reverse">
-                      {additionalActions.map((action, index) => (
-                        <Button
-                          key={index}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => action.onClick(item)}
-                          className={action.className}
-                        >
-                          {action.icon}
-                        </Button>
-                      ))}
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => handleEdit(item)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <Edit size={16} />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="text-red-500 hover:text-red-700"
-                            disabled={deletingId === item.id}
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="arabic-title">تأكيد الحذف</AlertDialogTitle>
-                            <AlertDialogDescription className="arabic-body">
-                              هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="modern-font">إلغاء</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDelete(item.id)}
-                              className="bg-red-600 hover:bg-red-700 modern-font"
-                            >
-                              حذف
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={columns.length + 1} className="text-center p-8 modern-font">
+                    جاري التحميل...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : items.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length + 1} className="text-center p-8 modern-font">
+                    لا توجد عناصر
+                  </td>
+                </tr>
+              ) : (
+                items.map(item => (
+                  <tr key={item.id} className="border-b border-[var(--sand-dark)] last:border-b-0 hover:bg-sand-light/50">
+                    {columns.map((column) => (
+                      <td key={column.key} className="p-3 lg:p-4 arabic-body text-sm lg:text-base">
+                        {renderCellContent(item, column)}
+                      </td>
+                    ))}
+                    <td className="p-3 lg:p-4 modern-font">
+                      <div className="flex space-x-1 lg:space-x-2 space-x-reverse">
+                        {additionalActions.map((action, index) => (
+                          <Button
+                            key={index}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => action.onClick(item)}
+                            className={action.className}
+                          >
+                            {action.icon}
+                          </Button>
+                        ))}
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleEdit(item)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Edit size={14} />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-red-500 hover:text-red-700"
+                              disabled={deletingId === item.id}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="arabic-title">تأكيد الحذف</AlertDialogTitle>
+                              <AlertDialogDescription className="arabic-body">
+                                هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="modern-font">إلغاء</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleDelete(item.id)}
+                                className="bg-red-600 hover:bg-red-700 modern-font"
+                              >
+                                حذف
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-4">
+        {loading ? (
+          <div className="text-center p-8 modern-font bg-white/80 rounded-lg">
+            جاري التحميل...
+          </div>
+        ) : items.length === 0 ? (
+          <div className="text-center p-8 modern-font bg-white/80 rounded-lg">
+            لا توجد عناصر
+          </div>
+        ) : (
+          items.map(item => (
+            <div key={item.id} className="bg-white/80 rounded-lg shadow-md border border-[var(--sand-dark)] p-4">
+              {columns.map((column) => (
+                <div key={column.key} className="mb-3 last:mb-0">
+                  <div className="text-sm font-semibold text-gray-600 arabic-title mb-1">
+                    {column.label}
+                  </div>
+                  <div className="arabic-body text-sm">
+                    {renderCellContent(item, column)}
+                  </div>
+                </div>
+              ))}
+              <div className="flex justify-end space-x-2 space-x-reverse mt-4 pt-3 border-t border-gray-200">
+                {additionalActions.map((action, index) => (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => action.onClick(item)}
+                    className={action.className}
+                  >
+                    {action.icon}
+                  </Button>
+                ))}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleEdit(item)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <Edit size={16} />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-500 hover:text-red-700"
+                      disabled={deletingId === item.id}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="max-w-sm mx-auto">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="arabic-title">تأكيد الحذف</AlertDialogTitle>
+                      <AlertDialogDescription className="arabic-body">
+                        هل أنت متأكد من حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="modern-font">إلغاء</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => handleDelete(item.id)}
+                        className="bg-red-600 hover:bg-red-700 modern-font"
+                      >
+                        حذف
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

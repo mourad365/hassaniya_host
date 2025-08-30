@@ -14,16 +14,16 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 -- Insert default categories
-INSERT INTO categories (name, name_fr, name_en, slug, type) VALUES
-('سياسة', 'Politique', 'Politics', 'politics', 'news'),
-('ثقافة', 'Culture', 'Culture', 'culture', 'news'),
-('رياضة', 'Sport', 'Sports', 'sports', 'news'),
-('اقتصاد', 'Économie', 'Economy', 'economy', 'news'),
-('عاجل', 'Urgent', 'Breaking', 'breaking', 'news'),
-('تقاليد وعادات', 'Traditions et coutumes', 'Traditions and Customs', 'traditions', 'culture'),
-('موسيقى تراثية', 'Musique traditionnelle', 'Traditional Music', 'music', 'culture'),
-('فنون شعبية', 'Arts populaires', 'Folk Arts', 'arts', 'culture'),
-('توثيق بصري', 'Documentation visuelle', 'Visual Documentation', 'documentation', 'culture')
+INSERT INTO categories (name, slug, type) VALUES
+('سياسة', 'politics', 'news'),
+('ثقافة', 'culture', 'news'),
+('رياضة', 'sports', 'news'),
+('اقتصاد', 'economy', 'news'),
+('عاجل', 'breaking', 'news'),
+('تقاليد وعادات', 'traditions', 'culture'),
+('موسيقى تراثية', 'music', 'culture'),
+('فنون شعبية', 'arts', 'culture'),
+('توثيق بصري', 'documentation', 'culture')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Media table
@@ -164,17 +164,50 @@ ALTER TABLE articles ADD COLUMN IF NOT EXISTS page_slug VARCHAR(500) UNIQUE;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 ALTER TABLE news ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id);
 
--- Migrate existing category data (update these based on your actual data)
-UPDATE articles SET category_id = (SELECT id FROM categories WHERE slug = 'politics') WHERE category = 'politics';
-UPDATE articles SET category_id = (SELECT id FROM categories WHERE slug = 'culture') WHERE category = 'culture';
-UPDATE articles SET category_id = (SELECT id FROM categories WHERE slug = 'sports') WHERE category = 'sports';
-UPDATE articles SET category_id = (SELECT id FROM categories WHERE slug = 'economy') WHERE category = 'economy';
+-- Migrate existing category data (guarded by column existence)
+DO $$
+BEGIN
+  -- Articles: prefer category_slug if it exists, else fall back to category
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'articles' AND column_name = 'category_slug'
+  ) THEN
+    UPDATE articles AS a
+    SET    category_id = c.id
+    FROM   categories AS c
+    WHERE  a.category_slug = c.slug;
+  ELSIF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'articles' AND column_name = 'category'
+  ) THEN
+    UPDATE articles AS a
+    SET    category_id = c.id
+    FROM   categories AS c
+    WHERE  a.category = c.slug;
+  END IF;
+END $$;
 
-UPDATE news SET category_id = (SELECT id FROM categories WHERE slug = 'politics') WHERE category = 'politics';
-UPDATE news SET category_id = (SELECT id FROM categories WHERE slug = 'culture') WHERE category = 'culture';
-UPDATE news SET category_id = (SELECT id FROM categories WHERE slug = 'sports') WHERE category = 'sports';
-UPDATE news SET category_id = (SELECT id FROM categories WHERE slug = 'economy') WHERE category = 'economy';
-UPDATE news SET category_id = (SELECT id FROM categories WHERE slug = 'breaking') WHERE category = 'breaking';
+DO $$
+BEGIN
+  -- News: prefer category_slug if it exists, else fall back to category
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'news' AND column_name = 'category_slug'
+  ) THEN
+    UPDATE news AS n
+    SET    category_id = c.id
+    FROM   categories AS c
+    WHERE  n.category_slug = c.slug;
+  ELSIF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'news' AND column_name = 'category'
+  ) THEN
+    UPDATE news AS n
+    SET    category_id = c.id
+    FROM   categories AS c
+    WHERE  n.category = c.slug;
+  END IF;
+END $$;
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_news_status ON news(status);
