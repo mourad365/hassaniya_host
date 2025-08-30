@@ -27,9 +27,9 @@ const AdminDashboardPage = () => {
               <Newspaper className="h-4 w-4 text-[var(--desert-brown)]" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold modern-font">1,234</div>
+              <div className="text-2xl font-bold modern-font">-</div>
               <p className="text-xs text-[var(--desert-brown)] modern-font">
-                +20.1% من الشهر الماضي
+                سيتم تحديث البيانات قريباً
               </p>
             </CardContent>
           </Card>
@@ -39,9 +39,9 @@ const AdminDashboardPage = () => {
               <Users className="h-4 w-4 text-[var(--desert-brown)]" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold modern-font">+2350</div>
+              <div className="text-2xl font-bold modern-font">-</div>
               <p className="text-xs text-[var(--desert-brown)] modern-font">
-                +180.1% من الشهر الماضي
+                سيتم تحديث البيانات قريباً
               </p>
             </CardContent>
           </Card>
@@ -51,15 +51,12 @@ const AdminDashboardPage = () => {
               <BarChart className="h-4 w-4 text-[var(--desert-brown)]" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold modern-font">+12,234</div>
+              <div className="text-2xl font-bold modern-font">-</div>
               <p className="text-xs text-[var(--desert-brown)] modern-font">
-                +19% من الشهر الماضي
+                سيتم تحديث البيانات قريباً
               </p>
             </CardContent>
           </Card>
-        </div>
-        <div className="text-center mt-8">
-            <p className="text-gray-500 modern-font">🚧 هذه البيانات هي مجرد مثال. سيتم ربطها بالبيانات الحقيقية قريباً!</p>
         </div>
       </div>
     </>

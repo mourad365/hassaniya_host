@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Upload } from 'lucide-react';
+import { uploadToBunny } from '@/services/mediaService';
 
 const createFormSchema = (isEditing = false) => z.object({
   title: z.string().min(3, { message: 'العنوان يجب أن يكون 3 أحرف على الأقل' }),
@@ -56,25 +57,16 @@ const MediaForm = ({ onSuccess, onCancel, editingMedia = null }) => {
     if (values.file && values.file.length > 0) {
       setUploading(true);
       const file = values.file[0];
-      const fileName = `${Date.now()}-${file.name}`;
 
       try {
-        // Direct upload to Bunny CDN Storage API
-        const uploadResponse = await fetch(`https://storage.bunnycdn.com/${import.meta.env.VITE_BUNNY_STORAGE_ZONE || 'hassaniya'}/${fileName}`, {
-          method: 'PUT',
-          headers: {
-            'AccessKey': import.meta.env.VITE_BUNNY_STORAGE_API_KEY || 'your-bunny-storage-api-key',
-            'Content-Type': file.type,
-          },
-          body: file,
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText}`);
-        }
+        // Upload using secure server-side method
+        const uploadResult = await uploadToBunny(file, values.media_type, 'ar');
         
-        // Construct the Bunny CDN URL
-        fileUrl = `${import.meta.env.VITE_BUNNY_CDN_URL || 'https://hassaniya.b-cdn.net'}/${fileName}`;
+        if (uploadResult.success) {
+          fileUrl = uploadResult.url;
+        } else {
+          throw new Error(uploadResult.error || 'Upload failed');
+        }
         
       } catch (error) {
         console.error('Upload error:', error);

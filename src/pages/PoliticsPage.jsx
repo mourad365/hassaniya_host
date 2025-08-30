@@ -20,11 +20,8 @@ const PoliticsPage = () => {
 
   const regions = [
     { id: 'all', label: t('allRegions'), icon: Globe },
-    { id: 'uae', label: t('uae'), icon: MapPin },
-    { id: 'morocco', label: t('morocco'), icon: MapPin },
     { id: 'mauritania', label: t('mauritania'), icon: MapPin },
     { id: 'sahara', label: t('westernSahara'), icon: MapPin },
-    { id: 'mali', label: t('mali'), icon: MapPin }
   ];
 
   const contentTypes = [
@@ -40,13 +37,29 @@ const PoliticsPage = () => {
 
   const fetchArticles = async () => {
     try {
+      // First get the politics category ID
+      const { data: categories, error: catError } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', 'politics')
+        .single();
+      
+      if (catError) {
+        console.error('Error fetching category:', catError);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('articles')
-        .select('*')
-        .eq('category', 'politics')
+        .select(`
+          *,
+          categories!inner(name, slug)
+        `)
+        .eq('category_id', categories.id)
         .order('created_at', { ascending: false });
       
       if (error) {
+        console.error('Fetch error from', supabase.supabaseUrl + '/rest/v1/articles?select=*&category_id=eq.' + categories.id + '&order=created_at.desc:', error);
         console.error('Error fetching articles:', error);
         return;
       }
@@ -59,14 +72,30 @@ const PoliticsPage = () => {
 
   const fetchVideos = async () => {
     try {
+      // First get the politics category ID
+      const { data: categories, error: catError } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', 'politics')
+        .single();
+      
+      if (catError) {
+        console.error('Error fetching category:', catError);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('media')
-        .select('*')
+        .select(`
+          *,
+          categories!inner(name, slug)
+        `)
         .eq('media_type', 'video')
-        .eq('category', 'politics')
+        .eq('category_id', categories.id)
         .order('created_at', { ascending: false });
       
       if (error) {
+        console.error('Fetch error from', supabase.supabaseUrl + '/rest/v1/media?select=*&media_type=eq.video&category_id=eq.' + categories.id + '&order=created_at.desc:', error);
         console.error('Error fetching videos:', error);
         return;
       }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
@@ -7,19 +6,41 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/use-language';
+import { supabase } from '@/lib/customSupabaseClient';
 
 const CulturePage = () => {
   const { t, language, isRTL } = useLanguage();
-  const [selectedCategory, setSelectedCategory] = useState(t('all'));
+  // Use stable ID for selection; render label with t('all')
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['/api/articles', { category: 'culture' }],
     queryFn: async () => {
-      const response = await fetch('/api/articles?category=culture');
-      if (!response.ok) {
+      // Get culture category ID first
+      const { data: categoryData, error: catError } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', 'culture')
+        .single();
+      
+      if (catError) {
+        throw new Error('Failed to fetch category');
+      }
+
+      const { data, error } = await supabase
+        .from('articles')
+        .select(`
+          *,
+          categories!inner(name, slug)
+        `)
+        .eq('category_id', categoryData.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
         throw new Error('Failed to fetch articles');
       }
-      return response.json();
+      
+      return data || [];
     }
   });
 
@@ -58,13 +79,10 @@ const CulturePage = () => {
     return iconMap[type] || BookOpen;
   };
 
-
-  const filteredArticles = selectedCategory === t('all') 
-    ? articles 
-    : articles.filter(article => {
-        const categoryName = language === 'ar' ? article.category : (article.categoryFr || article.category);
-        return categoryName === selectedCategory;
-      });
+  // Filter by category ID; 'all' shows everything
+  const filteredArticles = selectedCategory === 'all'
+    ? articles
+    : articles.filter(article => article.category === selectedCategory);
 
   const featuredArticles = articles.filter(article => article.featured);
 
@@ -103,10 +121,10 @@ const CulturePage = () => {
             className="text-center mb-12"
           >
             <h1 className="text-4xl md:text-5xl font-bold arabic-title text-[var(--tent-black)] mb-4">
-              الثقافة والتراث
+              {t('cultureAndHeritage')}
             </h1>
             <p className="text-xl arabic-body text-[var(--deep-brown)] max-w-3xl mx-auto">
-              استكشف عمق الثقافة الحسانية الأصيلة وتراثها العريق عبر العادات والتقاليد والفنون
+              {t('culturePageIntro')}
             </p>
             <div className="w-24 h-1 bg-[var(--heritage-gold)] mx-auto mt-6"></div>
           </motion.div>
@@ -140,7 +158,7 @@ const CulturePage = () => {
           </motion.div>
 
           {/* Featured Articles */}
-          {selectedCategory === 'الكل' && featuredArticles.length > 0 && (
+          {selectedCategory === 'all' && featuredArticles.length > 0 && (
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -148,7 +166,7 @@ const CulturePage = () => {
               className="mb-16"
             >
               <h2 className="text-3xl font-bold arabic-title text-[var(--tent-black)] mb-8 text-center">
-                المقالات المميزة
+                {t('featuredArticles')}
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {featuredArticles.map((article, index) => (
@@ -162,7 +180,7 @@ const CulturePage = () => {
                   >
                     <div className="absolute top-4 right-4 z-10">
                       <span className="bg-[var(--heritage-gold)] text-white px-3 py-1 rounded-full text-sm modern-font">
-                        مميز
+                        {t('featured')}
                       </span>
                     </div>
                     
@@ -170,7 +188,7 @@ const CulturePage = () => {
                       {article.image_url && (
                         <img  
                           className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                          alt={`صورة ${article.title}`}
+                          alt={article.title}
                           src={article.image_url} />
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -233,7 +251,7 @@ const CulturePage = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
           >
             <h2 className="text-3xl font-bold arabic-title text-[var(--tent-black)] mb-8 text-center">
-              {selectedCategory === 'الكل' ? 'جميع المقالات' : categories.find(cat => cat.id === selectedCategory)?.label}
+              {selectedCategory === 'all' ? t('allArticles') : categories.find(cat => cat.id === selectedCategory)?.label}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -250,7 +268,7 @@ const CulturePage = () => {
                     {article.image_url && (
                       <img  
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        alt={`صورة ${article.title}`}
+                        alt={article.title}
                         src={article.image_url} />
                     )}
                     <div className="absolute top-4 right-4">
@@ -261,7 +279,7 @@ const CulturePage = () => {
                     {article.featured && (
                       <div className="absolute top-4 left-4">
                         <span className="bg-[var(--heritage-gold)] text-white px-2 py-1 rounded text-xs modern-font">
-                          مميز
+                          {t('featured')}
                         </span>
                       </div>
                     )}
@@ -321,22 +339,22 @@ const CulturePage = () => {
           >
             <div className="heritage-card oasis-gradient text-white max-w-2xl mx-auto">
               <h3 className="text-2xl font-bold arabic-title mb-4">
-                شارك في حفظ التراث
+                {t('contributeToHeritage')}
               </h3>
               <p className="arabic-body mb-6 leading-relaxed">
-                هل لديك معلومات أو قصص تراثية تود مشاركتها؟ ساهم في إثراء المحتوى الثقافي لمنصة الحسانية
+                {t('contributeToHeritageDescription')}
               </p>
               <Button
                 onClick={() => {
                   toast({
-                    title: t('shareContent'),
+                    title: t('shareYourContent'),
                     description: t('featureNotImplemented'),
                     duration: 3000,
                   });
                 }}
-                className="bg-white text-[var(--oasis-blue)] hover:bg-[var(--sand-light)] px-8 py-3 modern-font"
+                className="bg-white text-black hover:bg-[var(--sand-light)] px-8 py-3 modern-font"
               >
-                شارك محتواك
+                {t('shareYourContent')}
               </Button>
             </div>
           </motion.section>

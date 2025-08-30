@@ -20,6 +20,10 @@ import ContactPage from '@/pages/ContactPage.jsx';
 import AuthPage from '@/pages/AuthPage';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import ArticleManagementPage from '@/pages/admin/ArticleManagementPage';
+import NewsManagementPage from '@/pages/admin/NewsManagementPage';
+import CoverageManagementPage from '@/pages/admin/CoverageManagementPage';
+import PodcastManagementPage from '@/pages/admin/PodcastManagementPage';
+import ProgramManagementPage from '@/pages/admin/ProgramManagementPage';
 import MediaManagementPage from '@/pages/admin/MediaManagementPage';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -51,6 +55,10 @@ function App() {
                 <Routes>
                   <Route path="/" element={<AdminDashboardPage />} />
                   <Route path="/articles" element={<ArticleManagementPage />} />
+                  <Route path="/news" element={<NewsManagementPage />} />
+                  <Route path="/coverage" element={<CoverageManagementPage />} />
+                  <Route path="/podcasts" element={<PodcastManagementPage />} />
+                  <Route path="/programs" element={<ProgramManagementPage />} />
                   <Route path="/media" element={<MediaManagementPage />} />
                 </Routes>
               </AdminLayout>

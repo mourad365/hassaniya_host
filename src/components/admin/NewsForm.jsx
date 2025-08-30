@@ -18,48 +18,41 @@ const formSchema = z.object({
   title: z.string().min(5, { message: 'العنوان يجب أن يكون 5 أحرف على الأقل' }),
   content: z.string().min(20, { message: 'المحتوى يجب أن يكون 20 حرفًا على الأقل' }),
   excerpt: z.string().min(10, { message: 'المقتطف يجب أن يكون 10 أحرف على الأقل' }),
-  category_id: z.string().nonempty({ message: 'الرجاء اختيار فئة' }),
-  image: z.any().optional(),
+  category: z.string().nonempty({ message: 'الرجاء اختيار فئة' }),
+  priority: z.string().nonempty({ message: 'الرجاء اختيار الأولوية' }),
+  location: z.string().optional(),
 });
 
-const ArticleForm = ({ article, onSuccess, onCancel }) => {
+const NewsForm = ({ item, onSuccess, onCancel }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: article?.title || '',
-      content: article?.content || '',
-      excerpt: article?.excerpt || '',
-      category_id: article?.category_id ? String(article.category_id) : '',
+      title: item?.title || '',
+      content: item?.content || '',
+      excerpt: item?.excerpt || '',
+      category: item?.category || '',
+      priority: item?.priority || 'medium',
+      location: item?.location || '',
     },
   });
 
-  // Update form when article changes
   useEffect(() => {
-    if (article) {
+    if (item) {
       form.reset({
-        title: article.title || '',
-        content: article.content || '',
-        excerpt: article.excerpt || '',
-        category_id: article.category_id ? String(article.category_id) : '',
+        title: item.title || '',
+        content: item.content || '',
+        excerpt: item.excerpt || '',
+        category: item.category || '',
+        priority: item.priority || 'medium',
+        location: item.location || '',
       });
     }
-  }, [article, form]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data, error } = await supabase.from('categories').select('id, name');
-      if (!error) {
-        setCategories(data);
-      }
-    };
-    fetchCategories();
-  }, []);
+  }, [item, form]);
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -68,61 +61,87 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
   };
 
   const onSubmit = async (values) => {
+    // Check authentication first
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "خطأ في المصادقة",
+        description: "يجب تسجيل الدخول أولاً لإنشاء الأخبار"
+      });
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     let imageUrl = null;
 
     if (imageFile) {
       try {
-        // Upload using secure server-side method
-        const uploadResult = await uploadToBunny(imageFile, 'thumbnails', 'ar');
-        
+        const uploadResult = await uploadToBunny(imageFile, 'news', 'ar');
         if (uploadResult.success) {
           imageUrl = uploadResult.url;
         } else {
           throw new Error(uploadResult.error || 'Upload failed');
         }
-        
       } catch (error) {
         console.warn('Image upload error:', error);
         toast({ 
           variant: "default", 
           title: "تحذير", 
-          description: "تم حفظ المقال بدون صورة. مشكلة في رفع الصورة." 
+          description: "تم حفظ الخبر بدون صورة. مشكلة في رفع الصورة." 
         });
         imageUrl = null;
       }
     }
 
+    // Get category ID from slug
+    const { data: categoryData, error: catError } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', values.category)
+      .single();
+
+    if (catError) {
+      toast({
+        variant: "destructive",
+        title: "خطأ في الفئة",
+        description: "لم يتم العثور على الفئة المحددة"
+      });
+      setLoading(false);
+      return;
+    }
+
     let error;
     
-    if (article) {
-      // Update existing article
+    if (item) {
       const updateData = {
         title: values.title,
         content: values.content,
         excerpt: values.excerpt,
-        category_id: parseInt(values.category_id),
+        category_id: categoryData.id,
+        priority: values.priority,
+        location: values.location,
         page_slug: values.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
       };
       
-      // Only update image if a new one was uploaded
       if (imageUrl) {
         updateData.image_url = imageUrl;
       }
       
       const result = await supabase
-        .from('articles')
+        .from('news')
         .update(updateData)
-        .eq('id', article.id);
+        .eq('id', item.id);
       
       error = result.error;
     } else {
-      // Create new article
-      const result = await supabase.from('articles').insert({
+      const result = await supabase.from('news').insert({
         title: values.title,
         content: values.content,
         excerpt: values.excerpt,
-        category_id: parseInt(values.category_id),
+        category_id: categoryData.id,
+        priority: values.priority,
+        location: values.location,
         author_id: user.id,
         author_name: user.email.split('@')[0],
         image_url: imageUrl,
@@ -137,15 +156,15 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
     if (error) {
       toast({ 
         variant: "destructive", 
-        title: article ? "فشل تحديث المقال" : "فشل إنشاء المقال", 
+        title: item ? "فشل تحديث الخبر" : "فشل إنشاء الخبر", 
         description: error.message 
       });
     } else {
       toast({ 
         title: "✅ نجاح", 
-        description: article ? "تم تحديث المقال بنجاح!" : "تم إنشاء المقال بنجاح!" 
+        description: item ? "تم تحديث الخبر بنجاح!" : "تم إنشاء الخبر بنجاح!" 
       });
-      if (!article) {
+      if (!item) {
         form.reset();
         setImageFile(null);
       }
@@ -157,7 +176,7 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
   return (
     <Card className="heritage-card my-6">
       <CardHeader>
-        <CardTitle className="arabic-title text-2xl">{article ? 'تحرير المقال' : 'مقال جديد'}</CardTitle>
+        <CardTitle className="arabic-title text-2xl">{item ? 'تحرير الخبر' : 'خبر جديد'}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -169,12 +188,13 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
                 <FormItem>
                   <FormLabel className="arabic-font">العنوان</FormLabel>
                   <FormControl>
-                    <Input placeholder="عنوان المقال" {...field} className="arabic-body" />
+                    <Input placeholder="عنوان الخبر" {...field} className="arabic-body" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            
             <FormField
               control={form.control}
               name="excerpt"
@@ -182,12 +202,13 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
                 <FormItem>
                   <FormLabel className="arabic-font">مقتطف</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="مقتطف قصير عن المقال" {...field} className="arabic-body" />
+                    <Textarea placeholder="مقتطف قصير عن الخبر" {...field} className="arabic-body" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            
             <FormField
               control={form.control}
               name="content"
@@ -195,16 +216,17 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
                 <FormItem>
                   <FormLabel className="arabic-font">المحتوى</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="محتوى المقال الكامل" rows={10} {...field} className="arabic-body" />
+                    <Textarea placeholder="محتوى الخبر الكامل" rows={10} {...field} className="arabic-body" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
-                name="category_id"
+                name="category"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="arabic-font">الفئة</FormLabel>
@@ -215,30 +237,71 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories.map(cat => (
-                          <SelectItem key={cat.id} value={String(cat.id)} className="arabic-body">{cat.name}</SelectItem>
-                        ))}
+                        <SelectItem value="breaking" className="arabic-body">عاجل</SelectItem>
+                        <SelectItem value="politics" className="arabic-body">سياسة</SelectItem>
+                        <SelectItem value="culture" className="arabic-body">ثقافة</SelectItem>
+                        <SelectItem value="sports" className="arabic-body">رياضة</SelectItem>
+                        <SelectItem value="economy" className="arabic-body">اقتصاد</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormItem>
-                <FormLabel className="arabic-font">صورة المقال</FormLabel>
-                <FormControl>
-                  <Input type="file" accept="image/*" onChange={handleImageChange} className="arabic-body" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="arabic-font">الأولوية</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="arabic-body">
+                          <SelectValue placeholder="اختر الأولوية" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="high" className="arabic-body">عالية</SelectItem>
+                        <SelectItem value="medium" className="arabic-body">متوسطة</SelectItem>
+                        <SelectItem value="low" className="arabic-body">منخفضة</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="arabic-font">الموقع</FormLabel>
+                    <FormControl>
+                      <Input placeholder="موقع الخبر" {...field} className="arabic-body" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+            
+            <FormItem>
+              <FormLabel className="arabic-font">صورة الخبر</FormLabel>
+              <FormControl>
+                <Input type="file" accept="image/*" onChange={handleImageChange} className="arabic-body" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+            
             <div className="flex justify-end space-x-4 space-x-reverse">
               <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
                 إلغاء
               </Button>
               <Button type="submit" className="btn-heritage" disabled={loading}>
                 {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-                {loading ? 'جاري الحفظ...' : (article ? 'تحديث المقال' : 'حفظ المقال')}
+                {loading ? 'جاري الحفظ...' : (item ? 'تحديث الخبر' : 'حفظ الخبر')}
               </Button>
             </div>
           </form>
@@ -248,4 +311,4 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
   );
 };
 
-export default ArticleForm;
+export default NewsForm;

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Newspaper, LogOut, Home, Video } from 'lucide-react';
+import { LayoutDashboard, Newspaper, LogOut, Home, Video, Radio, Tv, Camera, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { toast } from '@/components/ui/use-toast';
@@ -21,7 +21,11 @@ const AdminSidebar = () => {
 
   const navItems = [
     { to: '/admin', icon: LayoutDashboard, label: 'لوحة التحكم' },
-    { to: '/admin/articles', icon: Newspaper, label: 'إدارة المقالات' },
+    { to: '/admin/articles', icon: FileText, label: 'إدارة المقالات' },
+    { to: '/admin/news', icon: Newspaper, label: 'إدارة الأخبار' },
+    { to: '/admin/coverage', icon: Camera, label: 'إدارة التغطيات' },
+    { to: '/admin/podcasts', icon: Radio, label: 'إدارة البودكاست' },
+    { to: '/admin/programs', icon: Tv, label: 'إدارة البرامج' },
     { to: '/admin/media', icon: Video, label: 'إدارة الوسائط' },
   ];
 
@@ -48,7 +52,7 @@ const AdminSidebar = () => {
                   className={({ isActive }) =>
                     `flex items-center space-x-3 space-x-reverse p-3 my-2 rounded-lg transition-colors modern-font ${
                       isActive
-                        ? 'bg-[var(--heritage-gold)] text-white'
+                        ? 'bg-[var(--heritage-gold)] text-[var(--tent-black)]'
                         : 'hover:bg-[var(--sand-medium)]'
                     }`
                   }

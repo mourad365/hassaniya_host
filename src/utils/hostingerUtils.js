@@ -17,7 +17,6 @@ export function getHostingerMediaUrl(contentType, dialect, filename, hostinger) 
   const safeDialect = encodeURIComponent(String(dialect || "generic"));
   const safeType = encodeURIComponent(String(contentType || "thumbnails"));
   const safeFilename = encodeURIComponent(String(filename || "file"));
-  // Example: https://mousouaa.com/media/audio/hassaniya/myfile.mp3
   return `${hostinger.mediaUrl.replace(/\/$/, "")}/${safeType}/${safeDialect}/${safeFilename}`;
 }
 
