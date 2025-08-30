@@ -413,3 +413,4 @@ const CulturePage = () => {
 };
 
 export default CulturePage;
+//just test
