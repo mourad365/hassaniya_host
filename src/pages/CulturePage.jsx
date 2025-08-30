@@ -48,15 +48,15 @@ const CulturePage = () => {
     queryKey: ['/api/categories', 'culture'],
     queryFn: async () => {
       const response = await fetch('/api/categories?type=culture');
-      if (!response.ok) {
-        return [
-          { id: 'all', label: t('all'), icon: BookOpen },
-          { id: 'traditions', label: t('traditionsAndCustoms'), icon: User },
-          { id: 'music', label: t('traditionalMusic'), icon: Music },
-          { id: 'arts', label: t('folkArts'), icon: Palette },
-          { id: 'documentation', label: t('visualDocumentation'), icon: Camera }
-        ];
-      }
+      // if (!response.ok) {
+      //   return [
+      //     { id: 'all', label: t('all'), icon: BookOpen },
+      //     { id: 'traditions', label: t('traditionsAndCustoms'), icon: User },
+      //     { id: 'music', label: t('traditionalMusic'), icon: Music },
+      //     { id: 'arts', label: t('folkArts'), icon: Palette },
+      //     { id: 'documentation', label: t('visualDocumentation'), icon: Camera }
+      //   ];
+      // }
       const data = await response.json();
       return [
         { id: 'all', label: t('all'), icon: BookOpen },
