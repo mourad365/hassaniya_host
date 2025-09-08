@@ -22,6 +22,7 @@ const Header = () => {
     { path: '/programs', slug: 'programs', label: t('programs') },
     { path: '/media', slug: 'media', label: t('media') },
     { path: '/opinion', slug: 'opinion', label: t('opinionArticles') },
+   // { path: '/facebook', slug: 'facebook', label: t('facebook') || 'Facebook' },
     { path: '/contact', slug: 'contact', label: t('contactUs') }
   ];
 

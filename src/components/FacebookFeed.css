@@ -1,0 +1,354 @@
+.facebook-feed-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f6f0 0%, #f1ede4 100%);
+  min-height: 100vh;
+}
+
+.facebook-feed-wrapper {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(218, 165, 32, 0.2);
+}
+
+.facebook-feed-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.facebook-posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.facebook-posts-header h3 {
+  color: #1877f2;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.view-all-link {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.view-all-link:hover {
+  color: #166fe5;
+}
+
+.facebook-posts-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.facebook-post {
+  background: #f8f9fa;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.facebook-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.post-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.post-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-content {
+  padding: 1.5rem;
+}
+
+.post-text p {
+  color: #495057;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.post-date {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.post-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat {
+  color: #6c757d;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.post-link {
+  display: inline-block;
+  background: #1877f2;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.post-link:hover {
+  background: #166fe5;
+}
+
+.facebook-cta {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.setup-instructions {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.setup-instructions h4 {
+  color: #1877f2;
+  margin-bottom: 1rem;
+}
+
+.setup-instructions ol {
+  color: #495057;
+  line-height: 1.6;
+}
+
+.setup-instructions ol li {
+  margin-bottom: 0.5rem;
+}
+
+.setup-instructions a {
+  color: #1877f2;
+  text-decoration: none;
+}
+
+.setup-instructions a:hover {
+  text-decoration: underline;
+}
+
+.facebook-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1877f2;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+}
+
+.facebook-cta-button:hover {
+  background: #166fe5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(24, 119, 242, 0.3);
+}
+
+.button-icon {
+  flex-shrink: 0;
+}
+
+.facebook-engagement {
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.facebook-engagement p {
+  color: #6c757d;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.engagement-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.action-item {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.facebook-feed-wrapper .fb-page {
+  width: 100% !important;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.facebook-feed-wrapper .fb-page span {
+  width: 100% !important;
+}
+
+.facebook-feed-wrapper .fb-page iframe {
+  border-radius: 12px !important;
+  border: none !important;
+}
+
+/* Loading state */
+.facebook-feed-wrapper blockquote {
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  margin: 0;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.facebook-feed-wrapper blockquote a {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.facebook-feed-wrapper blockquote a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .facebook-feed-container {
+    padding: 1rem;
+  }
+  
+  .facebook-feed-wrapper {
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .facebook-feed-container {
+    padding: 0.5rem;
+  }
+  
+  .facebook-feed-wrapper {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+}
+
+/* Loading spinner */
+.facebook-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1877f2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error state */
+.facebook-error {
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+}
+
+.facebook-error h3 {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.facebook-direct-link {
+  display: inline-block;
+  background: #1877f2;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.facebook-direct-link:hover {
+  background: #166fe5;
+}
+
+/* Animation for loading */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.facebook-feed-wrapper blockquote {
+  animation: pulse 2s infinite;
+}

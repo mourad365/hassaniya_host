@@ -17,7 +17,13 @@ import EmiratesPage from '@/pages/EmiratesPage';
 import MediaPage from '@/pages/MediaPage';
 import OpinionPage from '@/pages/OpinionPage';
 import ContactPage from '@/pages/ContactPage.jsx';
+import FacebookPage from '@/pages/FacebookPage';
 import AuthPage from '@/pages/AuthPage';
+import ArticleDetailPage from '@/pages/ArticleDetailPage';
+import NewsDetailPage from '@/pages/NewsDetailPage';
+import ProgramDetailPage from '@/pages/ProgramDetailPage';
+import PodcastDetailPage from '@/pages/PodcastDetailPage';
+import CoverageDetailPage from '@/pages/CoverageDetailPage';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import ArticleManagementPage from '@/pages/admin/ArticleManagementPage';
 import NewsManagementPage from '@/pages/admin/NewsManagementPage';
@@ -72,6 +78,11 @@ function App() {
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/news" element={<NewsPage />} />
+                  <Route path="/news/:slug" element={<NewsDetailPage />} />
+                  <Route path="/articles/:slug" element={<ArticleDetailPage />} />
+                  <Route path="/programs/:slug" element={<ProgramDetailPage />} />
+                  <Route path="/podcasts/:slug" element={<PodcastDetailPage />} />
+                  <Route path="/coverage/:slug" element={<CoverageDetailPage />} />
                   <Route path="/culture" element={<CulturePage />} />
                   <Route path="/politics" element={<PoliticsPage />} />
                   <Route path="/programs" element={<ProgramsPage />} />
@@ -79,6 +90,7 @@ function App() {
                   <Route path="/emirates" element={<EmiratesPage />} />
                   <Route path="/media" element={<MediaPage />} />
                   <Route path="/opinion" element={<OpinionPage />} />
+                  <Route path="/facebook" element={<FacebookPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                 </Routes>
               </main>
