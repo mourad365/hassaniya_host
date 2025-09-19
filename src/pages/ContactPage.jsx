@@ -38,23 +38,23 @@ const ContactPage = () => {
 
       if (error) {
         toast({
-          title: t('submitErrorTitle'),
-          description: t('submitErrorDesc'),
+          title: "خطأ في الإرسال",
+          description: "حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى.",
           variant: "destructive",
           duration: 3000,
         });
       } else {
         toast({
-          title: t('submitSuccessTitle'),
-          description: t('submitSuccessDesc'),
-          duration: 3000,
+          title: "تم الإرسال بنجاح",
+          description: "شكراً لك! تم إرسال رسالتك بنجاح. سنتواصل معك قريباً.",
+          duration: 5000,
         });
         setFormData({ name: '', email: '', subject: '', message: '' });
       }
     } else {
       toast({
-        title: t('requiredFieldsTitle'),
-        description: t('requiredFieldsDesc'),
+        title: "حقول مطلوبة",
+        description: "يرجى ملء جميع الحقول المطلوبة",
         variant: "destructive",
         duration: 3000,
       });
@@ -64,31 +64,33 @@ const ContactPage = () => {
   const contactInfo = [
     {
       icon: Mail,
-      title: t('contactEmail'),
-      value: "info@hassaniya.com",
-      description: t('contactGeneralInquiries')
+      title: "البريد الإلكتروني",
+      value: "Haroudeahmed@gmail.com",
+      description: "للاستفسارات العامة والتواصل",
+      ltr: true
     },
     {
       icon: Phone,
-      title: t('contactPhone'),
-      value: "+971 XX XXX XXXX",
-      description: t('contactSupport')
+      title: "الهاتف",
+      value: "+222 36329095",
+      description: "للتواصل المباشر",
+      ltr: true
     },
     {
       icon: MapPin,
-      title: t('contactAddress'),
-      value: "دبي، الإمارات العربية المتحدة",
-      description: t('contactHQ')
+      title: "العنوان",
+      value: "نواكشوط، موريتانيا",
+      description: "المقر الرئيسي"
     }
   ];
 
   return (
     <>
       <Helmet>
-        <title>{t('contactTitle')} - {t('siteName')}</title>
-        <meta name="description" content={t('contactDescription')} />
-        <meta property="og:title" content={`${t('contactTitle')} - ${t('siteName')}`} />
-        <meta property="og:description" content={t('contactDescription')} />
+        <title>تواصل معنا - الحسانية</title>
+        <meta name="description" content="تواصل مع فريق الحسانية للاستفسارات والاقتراحات" />
+        <meta property="og:title" content="تواصل معنا - الحسانية" />
+        <meta property="og:description" content="تواصل مع فريق الحسانية للاستفسارات والاقتراحات" />
       </Helmet>
 
       <div className="min-h-screen py-8">
@@ -99,9 +101,9 @@ const ContactPage = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl md:text-5xl font-bold arabic-title text-[var(--tent-black)] mb-4">{t('contactTitle')}</h1>
+            <h1 className="text-4xl md:text-5xl font-bold arabic-title text-[var(--tent-black)] mb-4">تواصل معنا</h1>
             <p className="text-xl arabic-body text-[var(--deep-brown)] max-w-3xl mx-auto">
-              {t('contactDescription')}
+              نحن هنا للاستماع إليك. تواصل معنا لأي استفسارات أو اقتراحات أو شراكات
             </p>
             <div className="w-24 h-1 bg-[var(--heritage-gold)] mx-auto mt-6"></div>
           </motion.div>
@@ -113,7 +115,7 @@ const ContactPage = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="heritage-card"
             >
-              <h2 className="text-2xl font-bold arabic-title text-[var(--tent-black)] mb-8">{t('sendUsMessage')}</h2>
+              <h2 className="text-2xl font-bold arabic-title text-[var(--tent-black)] mb-8">أرسل لنا رسالة</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="relative">
                   <User className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[var(--desert-brown)]" size={20} />
@@ -122,7 +124,7 @@ const ContactPage = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    placeholder={t('fullNamePlaceholder')}
+                    placeholder="الاسم الكامل"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-lg border border-[var(--sand-dark)] bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] arabic-body"
                   />
@@ -134,7 +136,7 @@ const ContactPage = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    placeholder={t('emailPlaceholder')}
+                    placeholder="البريد الإلكتروني"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-lg border border-[var(--sand-dark)] bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] arabic-body"
                   />
@@ -146,7 +148,7 @@ const ContactPage = () => {
                     name="subject"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    placeholder={t('subjectPlaceholder')}
+                    placeholder="الموضوع"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-lg border border-[var(--sand-dark)] bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] arabic-body"
                   />
@@ -157,7 +159,7 @@ const ContactPage = () => {
                     name="message"
                     value={formData.message}
                     onChange={handleInputChange}
-                    placeholder={t('messagePlaceholder')}
+                    placeholder="رسالتك"
                     rows="6"
                     required
                     className="w-full px-4 py-3 pr-12 rounded-lg border border-[var(--sand-dark)] bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] arabic-body"
@@ -165,7 +167,7 @@ const ContactPage = () => {
                 </div>
                 <Button type="submit" disabled={loading} className="w-full btn-heritage modern-font text-lg flex items-center justify-center space-x-2 space-x-reverse">
                   <Send size={18} />
-                  <span>{loading ? t('sending') : t('sendMessage')}</span>
+                  <span>{loading ? 'جاري الإرسال...' : 'إرسال الرسالة'}</span>
                 </Button>
               </form>
             </motion.div>
@@ -193,29 +195,13 @@ const ContactPage = () => {
                       <h3 className="text-xl font-bold arabic-title text-[var(--tent-black)] mb-2">
                         {info.title}
                       </h3>
-                      <p className="text-lg text-[var(--deep-brown)] modern-font mb-2">{info.value}</p>
+                      <p className="text-lg text-[var(--deep-brown)] modern-font mb-2" dir={info.ltr ? 'ltr' : undefined}>{info.value}</p>
                       <p className="text-sm text-[var(--desert-brown)] arabic-body">{info.description}</p>
                     </div>
                   </motion.div>
                 );
               })}
               
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
-                className="heritage-card"
-              >
-                <h3 className="text-2xl font-bold arabic-title text-[var(--tent-black)] mb-4">{t('mapTitle')}</h3>
-                <div className="w-full h-64 bg-[var(--sand-medium)] rounded-lg flex items-center justify-center text-center">
-                  <div className="p-4">
-                    <MapPin size={48} className="text-[var(--desert-brown)] mx-auto mb-4" />
-                    <p className="text-[var(--deep-brown)] arabic-body">
-                      {t('mapComingSoon')}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
             </motion.div>
           </div>
         </div>

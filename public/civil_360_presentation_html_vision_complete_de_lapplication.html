@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIVIL360 – Présentation HTML</title>
+  <style>
+    :root{
+      --bg:#0f1222;--card:#141833;--muted:#2a2f55;--ink:#eef1ff;--ink-dim:#c8ccff;--accent:#6c8cff;--accent-2:#22d3ee;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0b0e1b, #0f1222 35%, #0f1222);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    a{color:var(--accent)}
+    .container{max-width:1200px;margin:auto;padding:28px}
+    .hero{display:grid;gap:18px;grid-template-columns:1.1fr .9fr;align-items:center}
+    .hero h1{font-size:clamp(26px,3.4vw,44px);margin:0}
+    .hero p{color:var(--ink-dim);margin:6px 0 0}
+    .card{background:linear-gradient(180deg,var(--card),#101433);border:1px solid #1e2451;border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--muted);border-radius:999px;background:rgba(255,255,255,.04);color:var(--ink-dim);font-weight:600}
+    .grid-3{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-2{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-4{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+    @media (max-width:980px){.hero{grid-template-columns:1fr}.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+    @media (max-width:640px){.grid-3,.grid-4{grid-template-columns:1fr}}
+    h2{font-size:clamp(18px,2.4vw,28px);margin:8px 0 14px}
+    h3{font-size:clamp(16px,2vw,22px);margin:10px 0}
+    .kpi{display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid #23295a;border-radius:14px;background:linear-gradient(180deg,#10163a,#0f1335)}
+    .kpi strong{font-size:20px}
+    .kpi small{color:var(--ink-dim)}
+    .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+    .badge{border-radius:8px;padding:4px 8px;font-weight:600}
+    .ok{background:rgba(34,197,94,.12);color:#8af3b2;border:1px solid rgba(34,197,94,.25)}
+    .warn{background:rgba(245,158,11,.12);color:#ffd18b;border:1px solid rgba(245,158,11,.28)}
+    .bad{background:rgba(239,68,68,.12);color:#ff9c9c;border:1px solid rgba(239,68,68,.28)}
+    .muted{color:var(--ink-dim)}
+    table{width:100%;border-collapse:separate;border-spacing:0 10px}
+    th,td{text-align:left;padding:10px 12px}
+    thead th{color:#cfd4ff;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+    tbody tr{background:linear-gradient(180deg,#0f1436,#0b1030);border:1px solid #1d2350}
+    tbody tr td:first-child{border-radius:12px 0 0 12px}
+    tbody tr td:last-child{border-radius:0 12px 12px 0}
+    .progress{height:10px;background:#1a2046;border-radius:999px;overflow:hidden}
+    .progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+    .legend span{display:inline-flex;align-items:center;gap:6px;color:var(--ink-dim)}
+    .dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .green{background:#22c55e}.yellow{background:#f59e0b}.red{background:#ef4444}
+    .map{height:240px;border:1px dashed #2a2f55;border-radius:12px;display:grid;place-items:center;color:#a8afff}
+    .section{margin:28px 0}
+    .split{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    @media (max-width:980px){.split{grid-template-columns:1fr}}
+    .toolbar{position:sticky;top:0;z-index:20;background:rgba(8,11,25,.75);backdrop-filter:blur(10px);border-bottom:1px solid #1c2148}
+    .toolbar .inner{max-width:1200px;margin:auto;display:flex;align-items:center;gap:10px;padding:10px 16px}
+    .toolbar nav{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-flex;gap:8px;align-items:center;border:1px solid #26306b;background:#151b3f;padding:8px 12px;border-radius:12px;color:var(--ink);text-decoration:none;font-weight:700}
+    .btn:hover{filter:brightness(1.1)}
+    .pill-nav{display:flex;gap:8px;flex-wrap:wrap}
+    .pill-nav a{padding:6px 10px;border:1px solid #27306b;border-radius:999px;text-decoration:none;color:var(--ink-dim)}
+    .pill-nav a.active{background:linear-gradient(180deg,#1a2252,#12183e);color:#fff}
+    .footer{opacity:.7;text-align:center;padding:22px 0}
+    .sr{position:absolute !important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}
+    /* print */
+    @media print{.toolbar,.pill-nav,.btn{display:none}body{background:#fff;color:#111} .card{box-shadow:none;border:1px solid #ddd;background:#fff} .container{max-width:none}}
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="inner">
+      <strong style="letter-spacing:.06em">CIVIL360</strong>
+      <nav>
+        <a class="btn" href="#top" aria-label="Revenir en haut">🏠 Accueil</a>
+        <a class="btn" href="#dg">👑 Directeur Général</a>
+        <a class="btn" href="#ing">🧮 Ingénieur</a>
+        <a class="btn" href="#achat">🛒 Directeur Achat</a>
+        <a class="btn" href="#log">🚚 Directeur Logistique</a>
+        <button class="btn" onclick="window.print()">🖨️ Exporter / PDF</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="top">
+    <section class="hero card">
+      <div>
+        <span class="pill">Présentation : <strong>CIVIL360</strong></span>
+        <h1>La plateforme de gestion intégrée des projets de génie civil</h1>
+        <p>Centraliser l'information • Synchroniser les actions • Optimiser les ressources.</p>
+        <div class="row" style="margin-top:12px">
+          <span class="badge ok">Réduction délais ≤ 15%</span>
+          <span class="badge ok">Dépassements budget ↓ 20%</span>
+          <span class="badge">Visibilité temps réel</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Le Défi : une gestion fragmentée</h3>
+        <ul class="muted">
+          <li>🧩 Données éparpillées (emails, Excel, papiers)</li>
+          <li>🙈 Décisions en aveugle (peu de temps réel)</li>
+          <li>💸 Gaspillage des ressources (surstock/ruptures)</li>
+          <li>📅 Délais & coûts imprévisibles</li>
+        </ul>
+        <h3 style="margin-top:16px">La Solution : un écosystème unifié</h3>
+        <ul class="muted">
+          <li>Une seule source de vérité</li>
+          <li>Automatisation des calculs & processus</li>
+          <li>Visibilité en temps réel & alertes</li>
+          <li>Optimisation intelligente des ressources</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- DG -->
+    <section class="section" id="dg">
+      <div class="row" style="justify-content:space-between;align-items:end">
+        <h2>VISION COMPLÈTE – Tableau de bord <em>Directeur Général</em></h2>
+        <div class="pill-nav" role="tablist" aria-label="Navigation sections DG">
+          <a href="#dg-kpi" class="active" onclick="setActive(this)">KPIs</a>
+          <a href="#dg-map" onclick="setActive(this)">Carte</a>
+          <a href="#dg-projets" onclick="setActive(this)">Projets</a>
+          <a href="#dg-finance" onclick="setActive(this)">Finance</a>
+          <a href="#dg-ress" onclick="setActive(this)">Ressources</a>
+          <a href="#dg-cal" onclick="setActive(this)">Calendrier</a>
+          <a href="#dg-alertes" onclick="setActive(this)">Alertes</a>
+          <a href="#dg-rapports" onclick="setActive(this)">Rapports</a>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" id="dg-kpi">
+          <h3>En‑tête & indicateurs clés (mois en cours)</h3>
+          <div class="grid-3">
+            <div class="kpi"><small>Projets actifs</small><strong>12</strong></div>
+            <div class="kpi"><small>Budget total</small><strong>15,8 M€ / 17,2 M€ <span class="muted">(92%)</span></strong></div>
+            <div class="kpi"><small>Taux d'avancement global</small><div class="progress" aria-label="Avancement global"><span style="width:68%"></span></div><small>68%</small></div>
+            <div class="kpi"><small>Délai moyen</small><strong>-2 jours</strong></div>
+            <div class="kpi"><small>Collaborateurs actifs</small><strong>87</strong></div>
+            <div class="kpi"><small>Alertes</small>
+              <div class="row">
+                <span class="badge bad">3 projets en dérive</span>
+                <span class="badge ok">5 livraisons cette semaine</span>
+                <span class="badge warn">2 équipements en panne</span>
+                <span class="badge warn">1 rupture de stock</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="dg-map">
+          <h3>Carte interactive des chantiers</h3>
+          <div class="map">(Aperçu carte – Paris, Lyon, Marseille, Bordeaux)</div>
+          <div class="legend">
+            <span><i class="dot green"></i> Dans les temps</span>
+            <span><i class="dot yellow"></i> Attention</span>
+            <span><i class="dot red"></i> En alerte</span>
+          </div>
+          <ul class="muted" style="margin-top:10px">
+            <li>🟢 <strong>Projet Lumia Tours</strong> (Paris) – Avancement 75%</li>
+            <li>🟡 <strong>Résidence Riviera</strong> (Lyon) – Avancement 40%</li>
+            <li>🔴 <strong>Pont Horizon</strong> (Marseille) – Avancement 15%</li>
+            <li>🟢 <strong>Centre Commercial Axis</strong> (Bordeaux) – Avancement 90%</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card section" id="dg-projets">
+        <h3>Détail des projets en cours</h3>
+        <table>
+          <thead><tr><th>Projet</th><th>Avancement</th><th>Budget</th><th>Délai</th><th>Risques</th></tr></thead>
+          <tbody>
+            <tr><td>Lumia Tours</td><td style="min-width:180px"><div class="progress"><span style="width:75%"></span></div><small>75%</small></td><td>4,5 M€ / 5 M€ (90%)</td><td>-3 jours</td><td>🔸 Dépassement béton prévu</td></tr>
+            <tr><td>Résidence Riviera</td><td><div class="progress"><span style="width:40%"></span></div><small>40%</small></td><td>2,8 M€ / 3,2 M€ (88%)</td><td>+7 jours</td><td>🔸 Retard approvision.</td></tr>
+            <tr><td>Pont Horizon</td><td><div class="progress"><span style="width:15%"></span></div><small>15%</small></td><td>1,2 M€ / 1,5 M€ (80%)</td><td>Dans temps</td><td>🔸 Météo défavorable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="split section" id="dg-finance">
+        <div class="card">
+          <h3>Analyse financière – Répartition budgétaire</h3>
+          <ul class="muted">
+            <li>• Main d'œuvre: 45%</li>
+            <li>• Matériaux: 35%</li>
+            <li>• Équipements: 15%</li>
+            <li>• Imprévus: 5%</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Évolution mensuelle (prévu vs réel)</h3>
+          <div class="map">(Graphique placeholder)</div>
+        </div>
+      </div>
+
+      <div class="split section" id="dg-ress">
+        <div class="card">
+          <h3>Disponibilité des équipements (critiques)</h3>
+          <ul class="muted">
+            <li>• Compacteurs: 4/5 disponibles</li>
+            <li>• Vibrateurs: 3/4 disponibles</li>
+            <li>• Grues: 2/3 disponibles</li>
+            <li class="warn">⚠️ 1 compacteur en panne à Marseille</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Localisation</h3>
+          <ul class="muted">
+            <li>• 3 sur Paris (Lumia)</li>
+            <li>• 1 sur Lyon (Riviera)</li>
+            <li>• 1 en maintenance</li>
+          </ul>
+          <div class="row"><span class="badge">Taux d'utilisation: 82%</span></div>
+        </div>
+      </div>
+
+      <div class="card section" id="dg-cal">
+        <h3>Calendrier stratégique</h3>
+        <div class="grid-2">
+          <div>
+            <h4>Semaine 34 (19–23 août)</h4>
+            <ul class="muted">
+              <li>19/08: Livraison acier – <em>Lumia</em></li>
+              <li>21/08: Début coulage dalle – <em>Riviera</em></li>
+              <li>23/08: Réunion client – <em>Horizon</em></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Semaine 35 (26–30 août)</h4>
+            <ul class="muted">
+              <li>26/08: Finition étage 12 – <em>Lumia</em></li>
+              <li>28/08: Contrôle technique – <em>Axis</em></li>
+              <li>30/08: Paiement facture fournisseur</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section" id="dg-alertes">
+        <h3>Centre des notifications</h3>
+        <div class="grid-3">
+          <div class="kpi"><strong class="bad">🔴 Urgent</strong><small>• Rupture stock ciment – Riviera<br/>• Retard livraison acier – 5 jours</small></div>
+          <div class="kpi"><strong class="warn">🟡 Attention</strong><small>• Dépassement budget MO – Lumia (+8%)<br/>• Alerte météo – Vent fort jeudi</small></div>
+          <div class="kpi"><strong class="ok">🟢 Information</strong><small>• Livraison réussie – Bois charpente<br/>• Réunion planifiée – Client Axis 10h</small></div>
+        </div>
+      </div>
+
+      <div class="card section" id="dg-rapports">
+        <h3>Rapports automatiques</h3>
+        <div class="row">
+          <a class="btn" href="#">📋 Rapport hebdo</a>
+          <a class="btn" href="#">📋 Rapport mensuel</a>
+          <a class="btn" href="#">📋 Rapport trimestriel</a>
+          <a class="btn" href="#">📋 Rapport personnalisé</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ingénieur -->
+    <section class="section" id="ing">
+      <h2>VISION COMPLÈTE – Tableau de bord <em>Ingénieur</em> (Projet)</h2>
+      <div class="card">
+        <h3>Création & configuration du projet</h3>
+        <div class="grid-2">
+          <div class="kpi"><small>Nom du projet</small><strong>Tour Lumia</strong></div>
+          <div class="kpi"><small>Localisation</small><strong>Paris 15ᵉ</strong></div>
+          <div class="kpi"><small>Type</small><strong>Bureaux</strong></div>
+          <div class="kpi"><small>Durée</small><strong>12 mois</strong></div>
+          <div class="kpi"><small>Budget</small><strong>5 000 000 €</strong></div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Définition de la structure (niveaux)</h3>
+        <table>
+          <thead><tr><th>Niveau</th><th>Type</th><th>Surface (m²)</th><th>Hauteur (m)</th><th>Ép. dalle (cm)</th></tr></thead>
+          <tbody>
+            <tr><td>Fondations</td><td>Infrastructure</td><td>850</td><td>-3.00</td><td>40</td></tr>
+            <tr><td>Sous-sol</td><td>Souterrain</td><td>800</td><td>-2.40</td><td>35</td></tr>
+            <tr><td>RDC</td><td>Étage</td><td>750</td><td>+0.00</td><td>30</td></tr>
+            <tr><td>Étage 1</td><td>Étage</td><td>720</td><td>+3.50</td><td>25</td></tr>
+            <tr><td>Étage 2</td><td>Étage</td><td>720</td><td>+7.00</td><td>25</td></tr>
+            <tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+            <tr><td>Toiture</td><td>Finition</td><td>700</td><td>+35.00</td><td>20</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Saisie technique – Fondations</h3>
+        <div class="grid-2">
+          <div>
+            <h4>Semelles isolées</h4>
+            <p class="muted">Nb: 24 • 1.2×1.2×0.8 m • Béton C25/30 • HA500<br>Volumes: 27.65 m³ béton • 1 850 kg acier</p>
+            <h4>Longrines</h4>
+            <p class="muted">125 ml • 0.3×0.5 m • C25/30 • HA500<br>18.75 m³ béton • 1 200 kg acier</p>
+            <h4>Radier</h4>
+            <p class="muted">120 m² • e=0.4 m • C25/30 • HA500<br>48.00 m³ béton • 2 880 kg acier</p>
+          </div>
+          <div>
+            <h4>Besoins matériaux – Fondations</h4>
+            <table>
+              <thead><tr><th>Matériau</th><th>Qté</th><th>Unité</th><th>PU</th><th>Total</th><th>Fournisseur</th></tr></thead>
+              <tbody>
+                <tr><td>Béton C25/30</td><td>94.40</td><td>m³</td><td>150 €</td><td>14 160 €</td><td>Lafarge</td></tr>
+                <tr><td>Acier HA500</td><td>5 930</td><td>kg</td><td>1.20 €</td><td>7 116 €</td><td>Arcelor</td></tr>
+                <tr><td>Coffrage</td><td>320</td><td>m²</td><td>45 €</td><td>14 400 €</td><td>Peri</td></tr>
+                <tr><td>Main d'œuvre</td><td>240</td><td>h</td><td>65 €</td><td>15 600 €</td><td>Interne</td></tr>
+                <tr><td colspan="6" class="muted">Total fondations : <strong>51 276 €</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Planning – Fondations</h3>
+        <table>
+          <thead><tr><th>Phase</th><th>Début</th><th>Fin</th><th>Durée</th><th>Équipe</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>Terrassement</td><td>01/09/2024</td><td>05/09/2024</td><td>5 j</td><td>Équipe A</td><td class="ok">🟢 Terminé</td></tr>
+            <tr><td>Coffrage</td><td>06/09/2024</td><td>12/09/2024</td><td>7 j</td><td>Équipe B</td><td class="warn">🟡 En cours</td></tr>
+            <tr><td>Ferraillage</td><td>08/09/2024</td><td>15/09/2024</td><td>8 j</td><td>Équipe C</td><td class="warn">🟡 En cours</td></tr>
+            <tr><td>Bétonnage</td><td>16/09/2024</td><td>18/09/2024</td><td>3 j</td><td>Équipe D</td><td class="bad">🔴 À venir</td></tr>
+            <tr><td>Décoffrage</td><td>19/09/2024</td><td>20/09/2024</td><td>2 j</td><td>Équipe B</td><td class="bad">🔴 À venir</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Commandes à passer – Fondations</h3>
+        <table>
+          <thead><tr><th>Matériau</th><th>Quantité</th><th>Livraison</th><th>Prix</th><th>Fournisseur</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Béton C25/30</td><td>94.40 m³</td><td>16/09/2024</td><td>14 160 €</td><td>Lafarge</td><td>✅ Passée</td></tr>
+            <tr><td>Acier HA500 8mm</td><td>1 200 kg</td><td>08/09/2024</td><td>1 440 €</td><td>Arcelor</td><td>✅ Passée</td></tr>
+            <tr><td>Acier HA500 12mm</td><td>3 500 kg</td><td>08/09/2024</td><td>4 200 €</td><td>Arcelor</td><td>✅ Passée</td></tr>
+            <tr><td>Coffrage</td><td>320 m²</td><td>06/09/2024</td><td>14 400 €</td><td>Peri</td><td>✅ Passée</td></tr>
+            <tr><td>Vibrateur</td><td>2 unités</td><td>15/09/2024</td><td>Location</td><td>Kiloutou</td><td>⏳ En attente</td></tr>
+          </tbody>
+        </table>
+        <div class="row" style="margin-top:10px"><a class="btn" href="#">🧾 Générer bon de commande</a><a class="btn" href="#">📤 Envoyer au Directeur Achat</a></div>
+      </div>
+
+      <div class="card section">
+        <h3>Journal de chantier – 12/09/2024</h3>
+        <div class="grid-3">
+          <div class="kpi"><small>Matériaux utilisés</small><strong>Coffrage 45 m² • Acier 12mm 320 kg • Béton 12.5 m³</strong></div>
+          <div class="kpi"><small>Main d'œuvre</small><strong>Éq. B: 40 h • Éq. C: 24 h</strong></div>
+          <div class="kpi"><small>Problèmes</small><strong>Retard livraison acier 8mm</strong></div>
+        </div>
+        <h4 style="margin-top:12px">Avancement détaillé</h4>
+        <table>
+          <thead><tr><th>Tâche</th><th>Prévu</th><th>Réalisé</th><th>Avancement</th><th>Statut</th><th>Retard</th></tr></thead>
+          <tbody>
+            <tr><td>Terrassement</td><td>100%</td><td>100%</td><td><div class="progress"><span style="width:100%"></span></div></td><td class="ok">✅ Terminé</td><td>0 j</td></tr>
+            <tr><td>Coffrage</td><td>100%</td><td>65%</td><td><div class="progress"><span style="width:65%"></span></div></td><td class="warn">🟡 En cours</td><td>+1 j</td></tr>
+            <tr><td>Ferraillage</td><td>100%</td><td>40%</td><td><div class="progress"><span style="width:40%"></span></div></td><td class="warn">🟡 En cours</td><td>+2 j</td></tr>
+            <tr><td>Bétonnage</td><td>0%</td><td>0%</td><td><div class="progress"><span style="width:0%"></span></div></td><td class="bad">🔴 À venir</td><td>-</td></tr>
+            <tr><td>Décoffrage</td><td>0%</td><td>0%</td><td><div class="progress"><span style="width:0%"></span></div></td><td class="bad">🔴 À venir</td><td>-</td></tr>
+          </tbody>
+        </table>
+        <p class="muted">Avancement global : <strong>41%</strong> • Retard prévisionnel: <strong>2 jours</strong></p>
+      </div>
+
+      <div class="card section">
+        <h3>Import des plans (CAO/BIM)</h3>
+        <ul class="muted">
+          <li>Formats: .dwg, .pdf, .rvt, .ifc</li>
+          <li>✅ Plan de masse.dwg – 1/200</li>
+          <li>✅ Plan fondations.pdf – 1/100</li>
+          <li>✅ Coupe structurelle.dwg – 1/50</li>
+          <li>⏳ Plan étage 1.pdf – en cours d'analyse</li>
+          <li>Fonctions : extraction des cotes, reconnaissance d'éléments, vérification d'incohérences, génération du métré</li>
+        </ul>
+      </div>
+
+      <div class="card section">
+        <h3>Module de calcul structural</h3>
+        <table>
+          <thead><tr><th>Élément</th><th>Section</th><th>Charge</th><th>Capacité</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Semelle S1</td><td>1.2×1.2 m</td><td>850 kN</td><td>920 kN</td><td class="ok">✅ Validé</td><td>-</td></tr>
+            <tr><td>Longrine L2</td><td>0.3×0.5 m</td><td>120 kN/m</td><td>135 kN/m</td><td class="ok">✅ Validé</td><td>-</td></tr>
+            <tr><td>Poteau P3</td><td>0.3×0.3 m</td><td>1 200 kN</td><td>1 150 kN</td><td class="warn">⚠️ Critique</td><td>🔄 Redimensionner</td></tr>
+            <tr><td>Dalle D1</td><td>0.25 m</td><td>8.5 kN/m²</td><td>9.2 kN/m²</td><td class="ok">✅ Validé</td><td>-</td></tr>
+          </tbody>
+        </table>
+        <div class="row" style="margin-top:10px"><a class="btn" href="#">▶️ Lancer les calculs</a><a class="btn" href="#">✨ Optimiser auto</a><a class="btn" href="#">📝 Générer note de calcul</a></div>
+      </div>
+    </section>
+
+    <!-- Directeur Achat -->
+    <section class="section" id="achat">
+      <h2>VISION COMPLÈTE – Tableau de bord <em>Directeur d'Achat</em></h2>
+      <div class="split">
+        <div class="card">
+          <h3>Vue globale des approvisionnements</h3>
+          <div class="grid-3">
+            <div class="kpi"><small>Cmd en cours</small><strong>45</strong></div>
+            <div class="kpi"><small>Budget mensuel</small><strong>850 K€ / 1.2 M€ (71%)</strong></div>
+            <div class="kpi"><small>Livraisons à l'heure</small><strong>87%</strong></div>
+            <div class="kpi"><small>Fournisseurs actifs</small><strong>12</strong></div>
+            <div class="kpi"><small>Urgences</small><div class="row"><span class="badge bad">2 retards</span><span class="badge warn">3 dépassements</span><span class="badge ok">15 livraisons sem.</span></div></div>
+          </div>
+          <h4>Répartition budgétaire</h4>
+          <ul class="muted">
+            <li>Béton & Ciment: 45%</li>
+            <li>Acier: 25%</li>
+            <li>Bois & Coffrage: 15%</li>
+            <li>Équipements: 10%</li>
+            <li>Divers: 5%</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Calendrier des livraisons</h3>
+          <table>
+            <thead><tr><th>Date</th><th>Projet</th><th>Matériau</th><th>Fournisseur</th><th>Statut</th></tr></thead>
+            <tbody>
+              <tr><td>12/09/2024</td><td>Axis</td><td>Briques 20×40</td><td>Wienerberger</td><td class="ok">✅ Livré</td></tr>
+              <tr><td>15/09/2024</td><td>Pont Horizon</td><td>Compacteur</td><td>Kiloutou</td><td class="bad">🔴 Retard</td></tr>
+              <tr><td>16/09/2024</td><td>Lumia Tours</td><td>Béton C25/30</td><td>Lafarge</td><td class="ok">✅ Livré</td></tr>
+              <tr><td>18/09/2024</td><td>Riviera</td><td>Acier HA500 8mm</td><td>Arcelor</td><td class="warn">🟡 Risque</td></tr>
+            </tbody>
+          </table>
+          <div class="row" style="margin-top:10px"><a class="btn" href="#">📤 Exporter calendrier</a><a class="btn" href="#">⏰ Programmer rappel</a><a class="btn" href="#">📣 Alerter fournisseur</a></div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Tableau des commandes en cours</h3>
+        <table>
+          <thead><tr><th>Projet</th><th>Matériel</th><th>Fournisseur</th><th>Quantité</th><th>Livraison</th><th>Statut</th><th>Montant</th><th>Retard</th></tr></thead>
+          <tbody>
+            <tr><td>Lumia Tours</td><td>Béton C25/30</td><td>Lafarge</td><td>94.40 m³</td><td>16/09/2024</td><td>✅ Livré</td><td>14 160 €</td><td>0 jour</td></tr>
+            <tr><td>Riviera</td><td>Acier HA500 12mm</td><td>Arcelor</td><td>3 500 kg</td><td>08/09/2024</td><td>🟡 En retard</td><td>4 200 €</td><td>+2 jours</td></tr>
+            <tr><td>Pont Horizon</td><td>Compacteur</td><td>Kiloutou</td><td>1 unité</td><td>15/09/2024</td><td>🔴 Urgent</td><td>450 €/j</td><td>+5 jours</td></tr>
+            <tr><td>Axis</td><td>Briques</td><td>Wienerberger</td><td>25 000 u</td><td>12/09/2024</td><td>✅ Livré</td><td>8 750 €</td><td>0 jour</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Gestion des fournisseurs</h3>
+        <table>
+          <thead><tr><th>Fournisseur</th><th>Catégorie</th><th>Note</th><th>Commandes</th><th>% à l'heure</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Lafarge</td><td>Béton</td><td>9.2/10</td><td>12</td><td>92%</td><td>✅ Fiable</td></tr>
+            <tr><td>Arcelor</td><td>Acier</td><td>7.1/10</td><td>8</td><td>75%</td><td>🟡 Suivi</td></tr>
+            <tr><td>Kiloutou</td><td>Location</td><td>6.5/10</td><td>5</td><td>60%</td><td>🔴 Alerte</td></tr>
+            <tr><td>Wienerberger</td><td>Matériaux</td><td>8.8/10</td><td>7</td><td>89%</td><td>✅ Fiable</td></tr>
+            <tr><td>Peri</td><td>Coffrage</td><td>9.0/10</td><td>3</td><td>100%</td><td>✅ Fiable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Suivi budgétaire détaillé</h3>
+        <table>
+          <thead><tr><th>Catégorie</th><th>Budget</th><th>Engagé</th><th>Restant</th><th>% Utilisé</th></tr></thead>
+          <tbody>
+            <tr><td>Béton & Ciment</td><td>375 000 €</td><td>268 450 €</td><td>106 550 €</td><td>72%</td></tr>
+            <tr><td>Acier</td><td>250 000 €</td><td>198 200 €</td><td>51 800 €</td><td>79%</td></tr>
+            <tr><td>Bois & Coffrage</td><td>125 000 €</td><td>87 500 €</td><td>37 500 €</td><td>70%</td></tr>
+            <tr><td>Équipements</td><td>75 000 €</td><td>42 300 €</td><td>32 700 €</td><td>56%</td></tr>
+            <tr><td>Divers</td><td>25 000 €</td><td>12 800 €</td><td>12 200 €</td><td>51%</td></tr>
+            <tr><td><strong>Total</strong></td><td>850 000 €</td><td>609 250 €</td><td>240 750 €</td><td>71%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Contrats & devis</h3>
+        <table>
+          <thead><tr><th>Fournisseur</th><th>Type</th><th>Début</th><th>Fin</th><th>Montant</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>Lafarge</td><td>Accord-cadre</td><td>01/01/2024</td><td>31/12/2024</td><td>300 000 €</td><td>✅ Actif</td></tr>
+            <tr><td>Arcelor</td><td>Commande ferme</td><td>15/08/2024</td><td>30/09/2024</td><td>85 000 €</td><td>✅ Actif</td></tr>
+            <tr><td>Kiloutou</td><td>Location</td><td>01/09/2024</td><td>30/09/2024</td><td>12 000 €</td><td>✅ Actif</td></tr>
+            <tr><td>Wienerberger</td><td>Accord-cadre</td><td>01/03/2024</td><td>28/02/2025</td><td>120 000 €</td><td>✅ Actif</td></tr>
+            <tr><td>Peri</td><td>Commande spot</td><td>10/09/2024</td><td>25/09/2024</td><td>45 000 €</td><td>✅ Actif</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Rapports d'achats</h3>
+        <div class="grid-3">
+          <div class="kpi"><small>Économies réalisées</small><strong>78 500 € (9%)</strong></div>
+          <div class="kpi"><small>Taux de service</small><strong>87%</strong></div>
+          <div class="kpi"><small>Délai moyen livraison</small><strong>2.3 jours</strong></div>
+        </div>
+        <div class="row" style="margin-top:10px"><a class="btn" href="#">📊 Générer rapport</a><a class="btn" href="#">⬇️ Exporter Excel</a><a class="btn" href="#">📤 Partager</a></div>
+      </div>
+    </section>
+
+    <!-- Directeur Logistique -->
+    <section class="section" id="log">
+      <h2>VISION COMPLÈTE – Tableau de bord <em>Directeur Logistique</em></h2>
+
+      <div class="split">
+        <div class="card">
+          <h3>Vue globale du parc matériel</h3>
+          <div class="grid-3">
+            <div class="kpi"><small>Équipements actifs</small><strong>58</strong></div>
+            <div class="kpi"><small>Taux d'utilisation</small><strong>82%</strong></div>
+            <div class="kpi"><small>Coût location mensuel</small><strong>45 000 €</strong></div>
+            <div class="kpi"><small>Transferts à l'heure</small><strong>92%</strong></div>
+            <div class="kpi"><small>Maintenances prév.</small><strong class="warn">2</strong></div>
+            <div class="kpi"><small>Transferts cette semaine</small><strong>12</strong></div>
+          </div>
+          <h4>Répartition du parc</h4>
+          <ul class="muted"><li>Compactage : 35%</li><li>Levage : 25%</li><li>Bétonnage : 20%</li><li>Divers : 20%</li></ul>
+        </div>
+        <div class="card">
+          <h3>Carte des équipements</h3>
+          <div class="map">(Localisation temps réel – Paris, Lyon, Marseille, Bordeaux, Entrepôt)</div>
+          <div class="legend" style="margin-top:8px">
+            <span><i class="dot green"></i> Disponible</span>
+            <span><i class="dot yellow"></i> Utilisé</span>
+            <span><i class="dot red"></i> En panne</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Inventaire des équipements</h3>
+        <table>
+          <thead><tr><th>Catégorie</th><th>Total</th><th>Disponible</th><th>Utilisé</th><th>Maint.</th><th>Panne</th></tr></thead>
+          <tbody>
+            <tr><td>Compacteurs</td><td>15</td><td>8</td><td>5</td><td>1</td><td>1</td></tr>
+            <tr><td>Vibrateurs</td><td>12</td><td>6</td><td>4</td><td>2</td><td>0</td></tr>
+            <tr><td>Grues</td><td>8</td><td>3</td><td>4</td><td>1</td><td>0</td></tr>
+            <tr><td>Bétonnières</td><td>10</td><td>4</td><td>5</td><td>1</td><td>0</td></tr>
+            <tr><td>Échafaudages</td><td>13</td><td>7</td><td>6</td><td>0</td><td>0</td></tr>
+            <tr><td><strong>Total</strong></td><td>58</td><td>28 (48%)</td><td>24 (41%)</td><td>5 (9%)</td><td>1 (2%)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card section">
+        <h3>Gestion des transferts</h3>
+        <table>
+          <thead><tr><th>Date</th><th>Équipement</th><th>Depuis</th><th>Vers</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>12/09/2024</td><td>Compacteur C5</td><td>Entrepôt</td><td>Lumia Tours</td><td class="ok">✅ Terminé</td></tr>
+            <tr><td>15/09/2024</td><td>Grue G2</td><td>Riviera</td><td>Pont Horizon</td><td class="bad">🔴 Retard</td></tr>
+            <tr><td>16/09/2024</td><td>Vibrateur V8</td><td>Axis</td><td>Lumia Tours</td><td class="warn">🟡 En cours</td></tr>
+            <tr><td>18/09/2024</td><td>Bétonnière B3</td><td>Entrepôt</td><td>Riviera</td><td>🟢 Planifié</td></tr>
+          </tbody>
+        </table>
+        <div class="row" style="margin-top:10px"><a class="btn" href="#">📅 Programmer</a><a class="btn" href="#">🔎 Disponibilité</a><a class="btn" href="#">📣 Alerter équipe</a></div>
+      </div>
+
+      <div class="card section">
+        <h3>Maintenance préventive</h3>
+        <table>
+          <thead><tr><th>Équipement</th><th>Dernière maint.</th><th>Prochaine</th><th>Type</th><th>Fournisseur</th></tr></thead>
+          <tbody>
+            <tr><td>Compacteur C5</td><td>15/08/2024</td><td>15/10/2024</td><td>Préventive</td><td>Volvo</td></tr>
+            <tr><td>Grue G2</td><td>01/09/2024</td><td>01/12/2024</td><td>Révision</td><td>Liebherr</td></tr>
+            <tr><td>Vibrateur V8</td><td>20/07/2024</td><td>20/10/2024</td><td>Vérification</td><td>Wacker Neuson</td></tr>
+            <tr><td>Bétonnière B3</td><td>05/09/2024</td><td>05/12/2024</td><td>Préventive</td><td>Mercedes</td></tr>
+          </tbody>
+        </table>
+        <h4>Maintenances urgentes</h4>
+        <ul class="muted">
+          <li>Compacteur C1 (Marseille) : huile moteur à changer – 5h</li>
+          <li>Vibrateur V3 (Lyon) : vérification circuit électrique – 2h</li>
+        </ul>
+        <div class="row" style="margin-top:10px"><a class="btn" href="#">🛠️ Planifier intervention</a><a class="btn" href="#">🧩 Commander pièces</a><a class="btn" href="#">📚 Historique</a></div>
+      </div>
+
+      <div class="card section">
+        <h3>Gestion des locations</h3>
+        <table>
+          <thead><tr><th>Équipement</th><th>Fournisseur</th><th>Début</th><th>Fin</th><th>Coût</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>Compacteur</td><td>Kiloutou</td><td>01/09/2024</td><td>30/09/2024</td><td>450 €/j</td><td>✅ Actif</td></tr>
+            <tr><td>Grue 50T</td><td>Loxam</td><td>15/08/2024</td><td>15/10/2024</td><td>800 €/j</td><td>✅ Actif</td></tr>
+            <tr><td>Bétonnière</td><td>Fraikin</td><td>01/09/2024</td><td>30/09/2024</td><td>300 €/j</td><td>✅ Actif</td></tr>
+            <tr><td>Vibrateur</td><td>Kiloutou</td><td>10/09/2024</td><td>10/10/2024</td><td>150 €/j</td><td>✅ Actif</td></tr>
+          </tbody>
+        </table>
+        <p class="muted">Coût mensuel total : <strong>45 000 €</strong> • Économies vs achat : <strong>12 000 €</strong></p>
+        <div class="row"><a class="btn" href="#">🔁 Renouveler</a><a class="btn" href="#">📅 Réserver</a><a class="btn" href="#">🤝 Négocier tarif</a></div>
+      </div>
+
+      <div class="card section">
+        <h3>Rapports logistiques</h3>
+        <div class="grid-3">
+          <div class="kpi"><small>Économies réalisées</small><strong>78 500 € (9%)</strong></div>
+          <div class="kpi"><small>Taux de disponibilité</small><strong>92%</strong></div>
+          <div class="kpi"><small>Délai moyen de transfert</small><strong>1.7 jours</strong></div>
+        </div>
+        <div class="row" style="margin-top:10px"><a class="btn" href="#">📊 Générer rapport</a><a class="btn" href="#">⬇️ Exporter Excel</a><a class="btn" href="#">📤 Partager</a></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="card">
+        <h3>Avantages clés</h3>
+        <div class="grid-4">
+          <div class="kpi"><strong>Vision temps réel</strong><small>de l'ensemble des activités</small></div>
+          <div class="kpi"><strong>Détection précoce</strong><small>des dérives & risques</small></div>
+          <div class="kpi"><strong>Optimisation</strong><small>des ressources et budgets</small></div>
+          <div class="kpi"><strong>Décisions data‑driven</strong><small>reporting automatique</small></div>
+          <div class="kpi"><strong>Communication fluide</strong><small>équipes & clients</small></div>
+          <div class="kpi"><strong>Traçabilité</strong><small>documents & opérations</small></div>
+          <div class="kpi"><strong>ROI rapide</strong><small>la solution se finance</small></div>
+          <div class="kpi"><strong>Maîtrise totale</strong><small>des projets de génie civil</small></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">© CIVIL360 – Présentation HTML. Exportez en PDF via « Imprimer ». </footer>
+  </main>
+
+  <script>
+    function setActive(a){
+      document.querySelectorAll('.pill-nav a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion du Parc Équipements - Directeur Logistique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .language-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .language-toggle button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        
+        .language-toggle button.active {
+            background: #3498db;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .equipment-table {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+        }
+        
+        .table-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-active {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        .status-available {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        .status-maintenance {
+            color: #f39c12;
+            font-weight: 600;
+        }
+        
+        .status-broken {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .transfer-notice {
+            background-color: #e8f4fd;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            color: #3498db;
+        }
+        
+        .alert-footer {
+            background-color: #fff3e0;
+            padding: 15px;
+            text-align: center;
+            border-top: 2px solid #f39c12;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        
+        .arabic-table {
+            direction: rtl;
+        }
+        
+        .arabic-table th, .arabic-table td {
+            text-align: right;
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .table-header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button id="show-french" class="active">Version Française</button>
+        <button id="show-arabic">Version Arabe</button>
+        <button id="show-both">Afficher les Deux</button>
+    </div>
+    
+    <div class="container">
+        <div class="equipment-table french-version">
+            <div class="table-header">
+                <h1>GESTION DU PARC ÉQUIPEMENTS - DIRECTEUR LOGISTIQUE</h1>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>ÉQUIPEMENT</th>
+                        <th>MODÈLE</th>
+                        <th>LOCALISATION</th>
+                        <th>STATUT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Vibrateur</td>
+                        <td>Wacker Neuson 60</td>
+                        <td>Tour Lumia</td>
+                        <td class="status-active">🟢 EN UTILISATION</td>
+                    </tr>
+                    <tr>
+                        <td>Vibrateur</td>
+                        <td>Atlas Copco</td>
+                        <td>Entrepôt Central</td>
+                        <td class="status-available">🟢 DISPONIBLE</td>
+                    </tr>
+                    <tr>
+                        <td>Compacteur</td>
+                        <td>Bomag 120</td>
+                        <td>Résidence Riviera</td>
+                        <td class="status-maintenance">🟡 EN MAINTENANCE (21/08)</td>
+                    </tr>
+                    <tr>
+                        <td>Compacteur</td>
+                        <td>Caterpillar</td>
+                        <td>Pont Horizon</td>
+                        <td class="status-broken">🔴 PANNE (⚠️)</td>
+                    </tr>
+                    <tr>
+                        <td>Grues</td>
+                        <td>Liebherr 200T</td>
+                        <td>Tour Lumia</td>
+                        <td class="status-active">🟢 EN UTILISATION</td>
+                    </tr>
+                    <tr>
+                        <td>Grues</td>
+                        <td>Potain MDT</td>
+                        <td>Entrepôt Central</td>
+                        <td class="status-available">🟢 DISPONIBLE</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="transfer-notice">
+                📍 TRANSFERT EN COURS: Compacteur vers Pont Horizon (Prévu: 22/08)
+            </div>
+            
+            <div class="alert-footer">
+                ⚠️ ÉQUIPEMENTS CRITIQUES: 1 EN PANNE - 1 EN MAINTENANCE
+            </div>
+        </div>
+        
+        <div class="equipment-table arabic-table arabic-version">
+            <div class="table-header">
+                <h1>إدارة أسطول المعدات - مدير الخدمات اللوجستية</h1>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>المعدات</th>
+                        <th>الموديل</th>
+                        <th>الموقع</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>هزاز</td>
+                        <td>Wacker Neuson 60</td>
+                        <td>برج لوميا</td>
+                        <td class="status-active">🟢 قيد الاستخدام</td>
+                    </tr>
+                    <tr>
+                        <td>هزاز</td>
+                        <td>Atlas Copco</td>
+                        <td>المستودع المركزي</td>
+                        <td class="status-available">🟢 متاح</td>
+                    </tr>
+                    <tr>
+                        <td>مضغوط</td>
+                        <td>Bomag 120</td>
+                        <td>إقامة ريفيرا</td>
+                        <td class="status-maintenance">🟡 قيد الصيانة (21/08)</td>
+                    </tr>
+                    <tr>
+                        <td>مضغوط</td>
+                        <td>Caterpillar</td>
+                        <td>جسر هورايزون</td>
+                        <td class="status-broken">🔴 عطل (⚠️)</td>
+                    </tr>
+                    <tr>
+                        <td>رافعات</td>
+                        <td>Liebherr 200T</td>
+                        <td>برج لوميا</td>
+                        <td class="status-active">🟢 قيد الاستخدام</td>
+                    </tr>
+                    <tr>
+                        <td>رافعات</td>
+                        <td>Potain MDT</td>
+                        <td>المستودع المركزي</td>
+                        <td class="status-available">🟢 متاح</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="transfer-notice">
+                📍 نقل قيد التقدم: مضغوط إلى جسر هورايزون (مخطط: 22/08)
+            </div>
+            
+            <div class="alert-footer">
+                ⚠️ معدات حرجة: 1 معطلة - 1 قيد الصيانة
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const frenchVersion = document.querySelector('.french-version');
+            const arabicVersion = document.querySelector('.arabic-version');
+            const showFrenchBtn = document.getElementById('show-french');
+            const showArabicBtn = document.getElementById('show-arabic');
+            const showBothBtn = document.getElementById('show-both');
+            
+            // Initial state - show both
+            showBoth();
+            
+            showFrenchBtn.addEventListener('click', showFrench);
+            showArabicBtn.addEventListener('click', showArabic);
+            showBothBtn.addEventListener('click', showBoth);
+            
+            function showFrench() {
+                frenchVersion.style.display = 'block';
+                arabicVersion.style.display = 'none';
+                showFrenchBtn.classList.add('active');
+                showArabicBtn.classList.remove('active');
+                showBothBtn.classList.remove('active');
+            }
+            
+            function showArabic() {
+                frenchVersion.style.display = 'none';
+                arabicVersion.style.display = 'block';
+                showFrenchBtn.classList.remove('active');
+                showArabicBtn.classList.add('active');
+                showBothBtn.classList.remove('active');
+            }
+            
+            function showBoth() {
+                frenchVersion.style.display = 'block';
+                arabicVersion.style.display = 'block';
+                showFrenchBtn.classList.remove('active');
+                showArabicBtn.classList.remove('active');
+                showBothBtn.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

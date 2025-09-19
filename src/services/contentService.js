@@ -3,7 +3,6 @@
  */
 
 import { supabase } from '@/lib/customSupabaseClient';
-import { viewService } from './interactionService';
 
 export const contentService = {
   async getArticleBySlug(slug) {
@@ -19,11 +18,6 @@ export const contentService = {
         .single();
       
       if (error) throw error;
-      
-      // Increment view count
-      if (data) {
-        await viewService.incrementViewCount('article', data.id);
-      }
       
       return data;
     } catch (error) {
@@ -46,11 +40,6 @@ export const contentService = {
       
       if (error) throw error;
       
-      // Increment view count
-      if (data) {
-        await viewService.incrementViewCount('news', data.id);
-      }
-      
       return data;
     } catch (error) {
       console.error('Get news by slug error:', error);
@@ -68,11 +57,6 @@ export const contentService = {
         .single();
       
       if (error) throw error;
-      
-      // Increment view count
-      if (data) {
-        await viewService.incrementViewCount('program', data.id);
-      }
       
       return data;
     } catch (error) {
@@ -92,11 +76,6 @@ export const contentService = {
       
       if (error) throw error;
       
-      // Increment view count
-      if (data) {
-        await viewService.incrementViewCount('podcast', data.id);
-      }
-      
       return data;
     } catch (error) {
       console.error('Get podcast by slug error:', error);
@@ -114,11 +93,6 @@ export const contentService = {
         .single();
       
       if (error) throw error;
-      
-      // Increment view count
-      if (data) {
-        await viewService.incrementViewCount('coverage', data.id);
-      }
       
       return data;
     } catch (error) {

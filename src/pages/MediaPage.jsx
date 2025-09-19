@@ -98,13 +98,12 @@ const MediaPage = () => {
               duration: 'غير محدد',
               size: 'غير محدد',
               format: item.media_type === 'video' ? 'MP4' : item.media_type === 'audio' ? 'MP3' : 'PDF',
-              thumbnail: 'default-media',
               thumbnail_url: thumbnailUrl,
               author: item.author_name || 'غير معروف',
               date: item.publish_date,
-              views: Math.floor(Math.random() * 10000),
-              downloads: Math.floor(Math.random() * 1000),
-              featured: item.is_featured,
+              views: item.views ?? 0,
+              downloads: 0,
+              featured: item.is_featured || false,
               category: item.categories?.name || 'عام',
               file_url: item.file_url,
               media_type: item.media_type
@@ -113,162 +112,8 @@ const MediaPage = () => {
         );
         setMedia(transformedMedia);
       } else {
-        // No data in database, show fallback mock data with demo thumbnails
-        const mockMedia = [
-      {
-        id: 1,
-        title: "وثائقي: رحلة في التراث الحساني",
-        description: "فيلم وثائقي شامل يستكشف جذور التراث الحساني وانتشاره عبر القارات",
-        type: "فيديو",
-        duration: "45:30",
-        size: "1.2 GB",
-        format: "MP4",
-        thumbnail: "documentary-heritage",
-        thumbnail_url: "https://via.placeholder.com/640x360/2c3e50/ffffff?text=وثائقي+التراث+الحساني",
-        author: "فريق الإنتاج الثقافي",
-        date: "2024-01-15",
-        views: 15420,
-        downloads: 892,
-        featured: true,
-        category: "وثائقي ثقافي",
-        file_url: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        media_type: "video"
-      },
-      {
-        id: 2,
-        title: "تسجيل نادر: أمسية شعرية حسانية من الستينات",
-        description: "تسجيل صوتي نادر لأمسية شعرية حسانية من الستينات بأصوات شعراء مشهورين",
-        type: "صوت",
-        duration: "1:23:45",
-        size: "156 MB",
-        format: "MP3",
-        thumbnail: "poetry-evening",
-        thumbnail_url: "https://via.placeholder.com/640x360/34495e/ffffff?text=أمسية+شعرية+حسانية",
-        author: "أرشيف الإذاعة الوطنية",
-        date: "2024-01-14",
-        views: 8934,
-        downloads: 567,
-        featured: true,
-        category: "تسجيلات تراثية",
-        file_url: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
-        media_type: "audio"
-      },
-      {
-        id: 3,
-        title: "مجموعة صور: الحياة البدوية في الصحراء",
-        description: "مجموعة نادرة من الصور التاريخية توثق الحياة البدوية والتراث الحساني في الصحراء",
-        type: "صور",
-        duration: "50 صورة",
-        size: "245 MB",
-        format: "JPG",
-        thumbnail: "bedouin-life",
-        thumbnail_url: "https://via.placeholder.com/640x360/8b4513/ffffff?text=الحياة+البدوية",
-        author: "المصور التراثي سالم الكعبي",
-        date: "2024-01-13",
-        views: 12567,
-        downloads: 1234,
-        featured: false,
-        category: "توثيق تراثي",
-        file_url: null,
-        media_type: "image"
-      },
-      {
-        id: 4,
-        title: "كتاب رقمي: قاموس المصطلحات الحسانية",
-        description: "قاموس شامل للمصطلحات والكلمات الحسانية مع الشرح والأمثلة",
-        type: "وثائق",
-        duration: "320 صفحة",
-        size: "45 MB",
-        format: "PDF",
-        thumbnail: "hassaniya-dictionary",
-        thumbnail_url: "https://via.placeholder.com/640x360/7f8c8d/ffffff?text=قاموس+المصطلحات+الحسانية",
-        author: "د. محمد الحساني",
-        date: "2024-01-12",
-        views: 6789,
-        downloads: 2341,
-        featured: false,
-        category: "مراجع لغوية",
-        file_url: null,
-        media_type: "document"
-      },
-      {
-        id: 5,
-        title: "فيديو: تعليم الخط العربي التراثي",
-        description: "سلسلة تعليمية لتعلم الخط العربي التراثي المستخدم في المخطوطات الحسانية",
-        type: "فيديو",
-        duration: "25:15",
-        size: "680 MB",
-        format: "MP4",
-        thumbnail: "arabic-calligraphy",
-        thumbnail_url: "https://via.placeholder.com/640x360/16a085/ffffff?text=تعليم+الخط+العربي",
-        author: "الخطاط أحمد ولد محمد",
-        date: "2024-01-11",
-        views: 4532,
-        downloads: 345,
-        featured: false,
-        category: "تعليمي",
-        file_url: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        media_type: "video"
-      },
-      {
-        id: 6,
-        title: "تسجيل: موسيقى تراثية على آلة التيدينيت",
-        description: "تسجيل عالي الجودة لمقطوعات موسيقية تراثية على آلة التيدينيت الحسانية",
-        type: "صوت",
-        duration: "38:22",
-        size: "89 MB",
-        format: "FLAC",
-        thumbnail: "tidinit-music",
-        thumbnail_url: "https://via.placeholder.com/640x360/e67e22/ffffff?text=موسيقى+التيدينيت",
-        author: "الموسيقار يوسف ولد أحمد",
-        date: "2024-01-10",
-        views: 7821,
-        downloads: 456,
-        featured: false,
-        category: "موسيقى تراثية",
-        file_url: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
-        media_type: "audio"
-      },
-      {
-        id: 7,
-        title: "أرشيف صور: المخطوطات الحسانية النادرة",
-        description: "مجموعة مصورة من المخطوطات الحسانية النادرة المحفوظة في المكتبات العالمية",
-        type: "صور",
-        duration: "120 صورة",
-        size: "890 MB",
-        format: "TIFF",
-        thumbnail: "rare-manuscripts",
-        thumbnail_url: "https://via.placeholder.com/640x360/9b59b6/ffffff?text=المخطوطات+الحسانية",
-        author: "مكتبة الشيخ زايد",
-        date: "2024-01-09",
-        views: 9876,
-        downloads: 678,
-        featured: true,
-        category: "مخطوطات",
-        file_url: null,
-        media_type: "image"
-      },
-      {
-        id: 8,
-        title: "دليل: الحرف التراثية الحسانية",
-        description: "دليل مصور شامل للحرف التراثية الحسانية وطرق ممارستها",
-        type: "وثائق",
-        duration: "180 صفحة",
-        size: "78 MB",
-        format: "PDF",
-        thumbnail: "traditional-crafts",
-        thumbnail_url: "https://via.placeholder.com/640x360/27ae60/ffffff?text=الحرف+التراثية",
-        author: "جمعية التراث الحساني",
-        date: "2024-01-08",
-        views: 5432,
-        downloads: 789,
-        featured: false,
-        category: "حرف تراثية",
-        file_url: null,
-        media_type: "document"
-      }
-        ];
-        setMedia(mockMedia);
+        // No data in database
+        setMedia([]);
       }
     };
     
@@ -388,7 +233,7 @@ const MediaPage = () => {
                     onClick={() => setSelectedType(type.id)}
                     className={`flex items-center space-x-2 space-x-reverse px-6 py-3 rounded-full transition-all duration-300 modern-font focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] focus:ring-opacity-50 ${
                       selectedType === type.id
-                        ? 'bg-[var(--heritage-gold)] text-black shadow-lg scale-105'
+                        ? 'bg-[var(--heritage-gold)] text-white shadow-lg scale-105'
                         : 'bg-white/80 text-black hover:bg-[var(--sand-medium)] hover:text-black hover:scale-102 active:bg-[var(--sand-medium)] focus:bg-[var(--sand-medium)]'
                     }`}
                   >
@@ -655,48 +500,10 @@ const MediaPage = () => {
             </div>
           </motion.section>
 
-          {/* Upload Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-16 text-center"
-          >
-            <div className="heritage-card bg-white text-black max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold arabic-title mb-4 text-black">
-                ساهم في إثراء المكتبة
-              </h3>
-              <p className="arabic-body mb-6 leading-relaxed text-black">
-                هل لديك وسائط تراثية تود مشاركتها؟ ساعدنا في بناء أكبر مكتبة رقمية للتراث الحساني
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  onClick={() => {
-                    toast({
-                      title: "رفع ملف",
-                      description: "هذه الميزة غير متوفرة حالياً",
-                      duration: 3000,
-                    });
-                  }}
-                  className="bg-white text-black hover:bg-[var(--sand-light)] px-6 py-3 modern-font"
-                >
-                  رفع ملف
-                </Button>
-                <Button
-                  onClick={() => {
-                    toast({
-                      title: "إرشادات الرفع",
-                      description: "هذه الميزة غير متوفرة حالياً",
-                      duration: 3000,
-                    });
-                  }}
-                  className="border-2 border-black text-black hover:bg-[var(--sand-light)] hover:text-black px-6 py-3 modern-font"
-                >
-                  إرشادات الرفع
-                </Button>
-              </div>
-            </div>
-          </motion.section>
+          {/* Empty state when no media */}
+          {media.length === 0 && (
+            <div className="text-center text-[var(--deep-brown)] mt-8">لا توجد وسائط متاحة حالياً</div>
+          )}
         </div>
       </div>
       

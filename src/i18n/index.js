@@ -24,7 +24,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'ar', // Force Arabic as default
+    // Let LanguageDetector pick from localStorage/navigator; fallback to Arabic
     fallbackLng: 'ar',
     debug: false,
 
@@ -37,11 +37,5 @@ i18n
       caches: ['localStorage'],
     },
   });
-
-// Force Arabic language on initialization
-if (!localStorage.getItem('i18nextLng') || localStorage.getItem('i18nextLng') !== 'ar') {
-  localStorage.setItem('i18nextLng', 'ar');
-  i18n.changeLanguage('ar');
-}
 
 export default i18n;

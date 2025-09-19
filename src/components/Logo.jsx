@@ -9,18 +9,28 @@ const Logo = ({
   const { t } = useLanguage();
   
   const sizeClasses = {
-    sm: 'h-8 w-auto',
-    md: 'h-12 w-auto',
-    lg: 'h-16 w-auto'
+    sm: 'h-8',
+    md: 'h-12',
+    lg: 'h-16',
+    xl: 'h-24',
+    '2xl': 'h-32',
+    '3xl': 'h-40'
   };
-  
-  const logoSrc = variant === 'white' ? '/WHAITE LOGO.png' : '/LOGO.png';
   
   return (
     <img
-      src={logoSrc}
+      src={`${import.meta.env.BASE_URL}LOGO.png`}
       alt={t('siteName') || 'الحسانية'}
-      className={`object-contain ${sizeClasses[size]} ${className}`}
+      className={`${sizeClasses[size]} w-auto object-contain ${className}`}
+      onError={(e) => {
+        console.error('Logo failed:', e.target.src);
+        e.target.src = `${import.meta.env.BASE_URL}WHAITE LOGO.png`;
+        e.target.onerror = () => {
+          console.error('Both logos failed');
+          e.target.style.display = 'none';
+        };
+      }}
+      onLoad={() => console.log('Logo loaded successfully')}
     />
   );
 };

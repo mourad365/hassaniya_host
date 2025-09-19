@@ -1,7 +1,9 @@
 /**
- * Media Service for Bunny CDN file handling
+ * Media Service for Hostinger-based file handling
  * Replaces Supabase Storage functionality
  */
+
+import { getHostingerMediaUrl, convertSupabaseToHostinger } from '../utils/hostingerUtils';
 
 // Get media configuration from environment
 const getMediaConfig = () => {
@@ -15,10 +17,10 @@ const getMediaConfig = () => {
       'image/jpeg', 'image/png', 'image/webp', 'image/gif',
       'text/plain', 'text/markdown', 'text/csv'
     ],
-    bunny: {
-      storageApiKey: import.meta.env.VITE_BUNNY_STORAGE_API_KEY,
-      storageZone: import.meta.env.VITE_BUNNY_STORAGE_ZONE,
-      cdnUrl: import.meta.env.VITE_BUNNY_CDN_URL
+    hostinger: {
+      baseUrl: import.meta.env.VITE_BASE_URL || 'https://mousouaa.com',
+      mediaUrl: import.meta.env.VITE_MEDIA_URL || 'https://mousouaa.com/media',
+      apiUrl: import.meta.env.VITE_API_URL || 'https://mousouaa.com/api'
     }
   };
 };
@@ -57,7 +59,7 @@ export const validateFile = (file) => {
 };
 
 /**
- * Generate media URL for Bunny CDN
+ * Generate media URL for Hostinger hosting
  */
 export const generateMediaUrl = (
   contentType,
@@ -65,12 +67,11 @@ export const generateMediaUrl = (
   filename
 ) => {
   const config = getMediaConfig();
-  const sanitizedFilename = sanitizeFilename(filename);
-  return `${config.bunny.cdnUrl}/${contentType}/${dialect}/${sanitizedFilename}`;
+  return getHostingerMediaUrl(contentType, dialect, filename, config.hostinger);
 };
 
 /**
- * Convert existing Supabase URLs to Bunny CDN URLs
+ * Convert existing Supabase URLs to Hostinger URLs
  */
 export const migrateMediaUrl = (supabaseUrl) => {
   if (!supabaseUrl) return '';
@@ -80,13 +81,13 @@ export const migrateMediaUrl = (supabaseUrl) => {
     return supabaseUrl;
   }
   
-  // If it's a relative path, convert to Bunny CDN URL
+  // If it's a relative path, convert to full URL
   const config = getMediaConfig();
-  return `${config.bunny.cdnUrl}/${supabaseUrl.replace(/^\/+/, '')}`;
+  return convertSupabaseToHostinger ? convertSupabaseToHostinger(supabaseUrl, config.hostinger) : supabaseUrl;
 };
 
 /**
- * Upload file to Bunny CDN Storage
+ * Upload file to Bunny CDN
  */
 export const uploadToBunny = async (
   file,
@@ -112,25 +113,28 @@ export const uploadToBunny = async (
     };
   }
   
-  if (!config.bunny.storageApiKey || !config.bunny.storageZone) {
-    return {
-      success: false,
-      error: 'Bunny CDN configuration is missing. Please check environment variables.'
-    };
-  }
-  
   try {
-    const sanitizedFilename = sanitizeFilename(file.name);
-    const filePath = `${contentType}/${dialect}/${sanitizedFilename}`;
+    const bunnyStorageZone = import.meta.env.VITE_BUNNY_STORAGE_ZONE;
+    const bunnyApiKey = import.meta.env.VITE_BUNNY_STORAGE_API_KEY;
+    const bunnyUrl = import.meta.env.VITE_BUNNY_CDN_URL;
     
-    // Upload to Bunny Storage API
-    const uploadUrl = `https://storage.bunnycdn.com/${config.bunny.storageZone}/${filePath}`;
+    if (!bunnyStorageZone || !bunnyApiKey || !bunnyUrl) {
+      throw new Error('Bunny CDN configuration is missing');
+    }
+    
+    // Generate filename
+    const timestamp = Date.now();
+    const sanitizedName = sanitizeFilename(file.name);
+    const filename = `${contentType}/${dialect}/${timestamp}_${sanitizedName}`;
+    
+    // Upload to Bunny Storage
+    const uploadUrl = `https://storage.bunnycdn.com/${bunnyStorageZone}/${filename}`;
     
     const response = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'AccessKey': config.bunny.storageApiKey,
-        'Content-Type': 'application/octet-stream'
+        'AccessKey': bunnyApiKey,
+        'Content-Type': file.type,
       },
       body: file
     });
@@ -139,8 +143,8 @@ export const uploadToBunny = async (
       throw new Error(`Upload failed with status: ${response.status}`);
     }
     
-    // Generate the CDN URL
-    const cdnUrl = `${config.bunny.cdnUrl}/${filePath}`;
+    // Generate CDN URL
+    const cdnUrl = `${bunnyUrl}/${filename}`;
     
     console.log('File uploaded successfully to Bunny CDN:', cdnUrl);
     
@@ -151,6 +155,75 @@ export const uploadToBunny = async (
     
   } catch (error) {
     console.error('Bunny CDN upload error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Upload failed'
+    };
+  }
+};
+
+/**
+ * Upload file to Hostinger using PHP upload endpoint
+ */
+export const uploadToHostinger = async (
+  file,
+  contentType,
+  dialect
+) => {
+  const config = getMediaConfig();
+  
+  // Validate file
+  const validation = validateFile(file);
+  if (!validation.valid) {
+    return {
+      success: false,
+      error: validation.error
+    };
+  }
+  
+  // Check if uploads are enabled
+  if (!config.enableUpload) {
+    return {
+      success: false,
+      error: 'File uploads are currently disabled. Please contact administrator.'
+    };
+  }
+  
+  try {
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('content_type', contentType);
+    formData.append('dialect', dialect);
+    
+    // Upload to PHP endpoint
+    const uploadUrl = `${config.hostinger.apiUrl}/upload.php`;
+    
+    const response = await fetch(uploadUrl, {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header - let browser set it with boundary
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Upload failed with status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Upload failed');
+    }
+    
+    console.log('File uploaded successfully:', result.url);
+    
+    return {
+      success: true,
+      url: result.url
+    };
+    
+  } catch (error) {
+    console.error('Upload error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Upload failed'
@@ -208,6 +281,7 @@ export const generateDownloadLink = (url, filename) => {
 
 export default {
   uploadToBunny,
+  uploadToHostinger,
   generateMediaUrl,
   migrateMediaUrl,
   validateFile,

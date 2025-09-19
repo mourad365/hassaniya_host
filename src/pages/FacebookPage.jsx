@@ -31,14 +31,8 @@ const FacebookPage = () => {
 
           {/* Facebook Feed Component */}
           <FacebookFeed 
-            pageUrl="https://www.facebook.com/profile.php?id=100069866329907"
-            width="500"
-            height="700"
-            tabs="timeline"
-            hideCover={false}
-            showFacepile={true}
-            smallHeader={false}
-            adaptContainerWidth={true}
+            pageUrl="https://www.facebook.com/101470072189930"
+            pageId="101470072189930"
           />
 
           {/* Call to Action Section */}
@@ -51,7 +45,7 @@ const FacebookPage = () => {
                 {t('facebookCTA') || 'Like our page and be the first to know about our latest content, events, and cultural discussions.'}
               </p>
               <a
-                href="https://www.facebook.com/profile.php?id=100069866329907"
+                href="https://www.facebook.com/101470072189930"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-6 py-3 bg-[#1877f2] hover:bg-[#166fe5] text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"

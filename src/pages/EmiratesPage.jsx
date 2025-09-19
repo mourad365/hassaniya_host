@@ -24,39 +24,10 @@ const EmiratesPage = () => {
         .select('id, slug')
         .eq('type', 'emirates');
       
-      // If no emirates categories exist, return mock data
+      // If no emirates categories exist, return empty
       if (catError || !emiratesCategories || emiratesCategories.length === 0) {
-        console.warn('Emirates categories not found, returning mock data');
-        return [
-          {
-            id: 1,
-            title: "تاريخ إمارة أدرار العريقة",
-            excerpt: "نظرة شاملة على تاريخ إمارة أدرار ودورها في الحضارة الحسانية",
-            author: "د. محمد الأمين ولد أحمد",
-            date: "2024-01-15",
-            views: 1456,
-            rating: 4.8,
-            readTime: "8 دقائق",
-            emirate: "أدرار",
-            category: "تاريخ",
-            featured: true,
-            image_url: "/COVER.jpg"
-          },
-          {
-            id: 2,
-            title: "تراث إمارة براكنة الثقافي",
-            excerpt: "استكشاف للتراث الثقافي الغني لإمارة براكنة وتقاليدها",
-            author: "فاطمة بنت سالم",
-            date: "2024-01-10",
-            views: 1123,
-            rating: 4.6,
-            readTime: "6 دقائق",
-            emirate: "براكنة",
-            category: "ثقافة",
-            featured: false,
-            image_url: "/COVER.jpg"
-          }
-        ];
+        console.warn('Emirates categories not found');
+        return [];
       }
 
       // Get category IDs for the IN query
@@ -139,7 +110,7 @@ const EmiratesPage = () => {
   const getThumbnailUrl = (article) => {
     if (article.thumbnail_url) return migrateMediaUrl(article.thumbnail_url);
     if (article.image_url) return article.image_url;
-    return '/api/placeholder/400/300';
+    return null;
   };
 
   return (

@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/hooks/use-language';
-import Logo from '@/components/Logo';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -59,9 +58,11 @@ const AuthPage = () => {
         >
           <div className="heritage-card">
             <div className="text-center mb-8">
-              <div className="mx-auto mb-4">
-                <Logo variant="color" size="lg" />
-              </div>
+              <img 
+                src="https://horizons-cdn.hostinger.com/42d86645-ea33-4a6a-819e-609c46588941/b0205980cf3889256b96a7fd5a795ccf.png" 
+                alt="شعار الحسانية" 
+                className="h-20 w-auto mx-auto mb-4"
+              />
               <h1 className="text-3xl font-bold arabic-title text-[var(--tent-black)]">
                 {isLogin ? t('signInTitle') : t('createNewAccount')}
               </h1>

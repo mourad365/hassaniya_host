@@ -9,19 +9,21 @@ import Footer from '@/components/Footer';
 import './i18n';
 import HomePage from '@/pages/HomePage';
 import NewsPage from '@/pages/NewsPage';
+import NewsDetailPage from '@/pages/NewsDetailPage';
 import CulturePage from '@/pages/CulturePage';
 import PoliticsPage from '@/pages/PoliticsPage';
 import ProgramsPage from '@/pages/ProgramsPage';
+import ProgramDetailPage from '@/pages/ProgramDetailPage';
 import LiteraturePage from '@/pages/LiteraturePage';
 import EmiratesPage from '@/pages/EmiratesPage';
 import MediaPage from '@/pages/MediaPage';
 import OpinionPage from '@/pages/OpinionPage';
 import ContactPage from '@/pages/ContactPage.jsx';
 import FacebookPage from '@/pages/FacebookPage';
+import VideoPage from '@/pages/VideoPage';
+import VideosPage from '@/pages/VideosPage';
 import AuthPage from '@/pages/AuthPage';
 import ArticleDetailPage from '@/pages/ArticleDetailPage';
-import NewsDetailPage from '@/pages/NewsDetailPage';
-import ProgramDetailPage from '@/pages/ProgramDetailPage';
 import PodcastDetailPage from '@/pages/PodcastDetailPage';
 import CoverageDetailPage from '@/pages/CoverageDetailPage';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
@@ -31,6 +33,9 @@ import CoverageManagementPage from '@/pages/admin/CoverageManagementPage';
 import PodcastManagementPage from '@/pages/admin/PodcastManagementPage';
 import ProgramManagementPage from '@/pages/admin/ProgramManagementPage';
 import MediaManagementPage from '@/pages/admin/MediaManagementPage';
+import VideoManagementPage from '@/pages/admin/VideoManagementPage';
+import ContentUploadPage from '@/pages/admin/ContentUploadPage';
+import ContactsPage from '@/pages/admin/ContactsPage';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 
@@ -66,6 +71,9 @@ function App() {
                   <Route path="/podcasts" element={<PodcastManagementPage />} />
                   <Route path="/programs" element={<ProgramManagementPage />} />
                   <Route path="/media" element={<MediaManagementPage />} />
+                  <Route path="/videos" element={<VideoManagementPage />} />
+                  <Route path="/contacts" element={<ContactsPage />} />
+                  <Route path="/upload" element={<ContentUploadPage />} />
                 </Routes>
               </AdminLayout>
             </ProtectedRoute>
@@ -89,6 +97,7 @@ function App() {
                   <Route path="/literature" element={<LiteraturePage />} />
                   <Route path="/emirates" element={<EmiratesPage />} />
                   <Route path="/media" element={<MediaPage />} />
+                  <Route path="/videos" element={<VideosPage />} />
                   <Route path="/opinion" element={<OpinionPage />} />
                   <Route path="/facebook" element={<FacebookPage />} />
                   <Route path="/contact" element={<ContactPage />} />

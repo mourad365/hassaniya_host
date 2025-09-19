@@ -7,88 +7,43 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/use-language';
-import { supabase } from '@/lib/customSupabaseClient';
 
 const LiteraturePage = () => {
   const { t, language, isRTL } = useLanguage();
   const [selectedType, setSelectedType] = useState(t('all'));
 
   const { data: content = [], isLoading } = useQuery({
-    queryKey: ['literature'],
+    queryKey: ['/api/literature'],
     queryFn: async () => {
-      // Get literature category ID first
-      const { data: literatureCategories, error: catError } = await supabase
-        .from('categories')
-        .select('id, slug')
-        .eq('type', 'literature');
-      
-      // If no literature categories exist, return mock data
-      if (catError || !literatureCategories || literatureCategories.length === 0) {
-        console.warn('Literature categories not found, returning mock data');
-        return [
-          {
-            id: 1,
-            title: "قصائد من التراث الحساني",
-            excerpt: "مجموعة مختارة من أجمل القصائد التراثية الحسانية",
-            author: "الشاعر محمد ولد أحمد",
-            date: "2024-01-15",
-            views: 1234,
-            likes: 89,
-            readTime: "10 دقائق",
-            type: "poetry",
-            category: "شعر تراثي",
-            featured: true,
-            content: "يا راكب الخيل في البيداء منطلقاً\nإلى ديار الأحباب البعيدة\nبلغ سلامي لأهل الود واذكرني\nعند الحبيب بكل الحب والودّ"
-          },
-          {
-            id: 2,
-            title: "حكايات شعبية حسانية",
-            excerpt: "مجموعة من الحكايات الشعبية التراثية المتوارثة",
-            author: "الراوي أحمد ولد محمد",
-            date: "2024-01-10",
-            views: 987,
-            likes: 67,
-            readTime: "15 دقيقة",
-            type: "folktales",
-            category: "حكايات شعبية",
-            featured: false,
-            content: "كان يا ما كان في قديم الزمان..."
-          }
-        ];
+      const response = await fetch('/api/literature');
+      if (!response.ok) {
+        throw new Error('Failed to fetch literature');
       }
-
-      // Get category IDs for the IN query
-      const categoryIds = literatureCategories.map(cat => cat.id);
-
-      const { data, error } = await supabase
-        .from('articles')
-        .select(`
-          *,
-          categories!inner(name, slug)
-        `)
-        .in('category_id', categoryIds)
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.warn('Failed to fetch literature from database:', error);
-        return [];
-      }
-      
-      return data || [];
+      return response.json();
     }
   });
 
   const { data: contentTypes = [] } = useQuery({
-    queryKey: ['literature-types'],
+    queryKey: ['/api/literature-types'],
     queryFn: async () => {
-      // Always return the Arabic content types for literature page
+      const response = await fetch('/api/literature-types');
+      if (!response.ok) {
+        return [
+          { id: 'all', label: t('allTypes'), icon: BookOpen },
+          { id: 'poetry', label: t('poetry'), icon: Quote },
+          { id: 'prose', label: t('prose'), icon: FileText },
+          { id: 'folktales', label: t('folkTales'), icon: Mic },
+          { id: 'translations', label: t('translations'), icon: BookOpen }
+        ];
+      }
+      const data = await response.json();
       return [
         { id: 'all', label: t('allTypes'), icon: BookOpen },
-        { id: 'poetry', label: t('poetry'), icon: Quote },
-        { id: 'prose', label: t('prose'), icon: FileText },
-        { id: 'folktales', label: t('folkTales'), icon: Mic },
-        { id: 'translations', label: t('translations'), icon: BookOpen }
+        ...data.map(type => ({
+          id: type.id,
+          label: language === 'ar' ? type.name : type.nameFr || type.name,
+          icon: getIconForType(type.type)
+        }))
       ];
     }
   });
@@ -384,48 +339,6 @@ const LiteraturePage = () => {
             </div>
           </motion.section>
 
-          {/* Submit Content Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="mt-16 text-center"
-          >
-            <div className="heritage-card oasis-gradient text-white max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold arabic-title mb-4 text-black">
-                شارك إبداعك الأدبي
-              </h3>
-              <p className="arabic-body mb-6 leading-relaxed text-black">
-                هل لديك قصائد أو نصوص أو حكايات تود مشاركتها؟ ساهم في إثراء المكتبة الأدبية الحسانية
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  onClick={() => {
-                    toast({
-                      title: t('submitText'),
-                      description: t('featureNotImplemented'),
-                      duration: 3000,
-                    });
-                  }}
-                  className="bg-white text-black hover:bg-[var(--sand-light)] px-6 py-3 modern-font"
-                >
-                  أرسل نصك
-                </Button>
-                <Button
-                  onClick={() => {
-                    toast({
-                      title: t('audioRecording'),
-                      description: t('featureNotImplemented'),
-                      duration: 3000,
-                    });
-                  }}
-                  className="border-2 border-white text-black hover:bg-white hover:text-black px-6 py-3 modern-font"
-                >
-                  تسجيل صوتي
-                </Button>
-              </div>
-            </div>
-          </motion.section>
         </div>
       </div>
     </>

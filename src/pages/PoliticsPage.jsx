@@ -14,14 +14,18 @@ const PoliticsPage = () => {
   const { t } = useTranslation();
   const [articles, setArticles] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [categoryId, setCategoryId] = useState(null);
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedContentType, setSelectedContentType] = useState('all');
   const [videoPlayer, setVideoPlayer] = useState({ isOpen: false, src: '', title: '' });
 
   const regions = [
     { id: 'all', label: t('allRegions'), icon: Globe },
+    { id: 'uae', label: t('uae'), icon: MapPin },
+    { id: 'morocco', label: t('morocco'), icon: MapPin },
     { id: 'mauritania', label: t('mauritania'), icon: MapPin },
     { id: 'sahara', label: t('westernSahara'), icon: MapPin },
+    { id: 'mali', label: t('mali'), icon: MapPin }
   ];
 
   const contentTypes = [
@@ -31,35 +35,37 @@ const PoliticsPage = () => {
   ];
 
   useEffect(() => {
-    fetchArticles();
-    fetchVideos();
-  }, []);
-
-  const fetchArticles = async () => {
-    try {
-      // First get the politics category ID
-      const { data: categories, error: catError } = await supabase
+    const init = async () => {
+      // Look up the category_id for the 'politics' slug
+      const { data, error } = await supabase
         .from('categories')
         .select('id')
         .eq('slug', 'politics')
         .single();
-      
-      if (catError) {
-        console.error('Error fetching category:', catError);
+
+      if (error) {
+        console.error('Error fetching category id for politics:', error);
         return;
       }
 
+      if (data?.id) {
+        setCategoryId(data.id);
+        await fetchArticles(data.id);
+        await fetchVideos(data.id);
+      }
+    };
+    init();
+  }, []);
+
+  const fetchArticles = async (catId) => {
+    try {
       const { data, error } = await supabase
         .from('articles')
-        .select(`
-          *,
-          categories!inner(name, slug)
-        `)
-        .eq('category_id', categories.id)
+        .select('*')
+        .eq('category_id', catId)
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Fetch error from', supabase.supabaseUrl + '/rest/v1/articles?select=*&category_id=eq.' + categories.id + '&order=created_at.desc:', error);
         console.error('Error fetching articles:', error);
         return;
       }
@@ -70,32 +76,16 @@ const PoliticsPage = () => {
     }
   };
 
-  const fetchVideos = async () => {
+  const fetchVideos = async (catId) => {
     try {
-      // First get the politics category ID
-      const { data: categories, error: catError } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('slug', 'politics')
-        .single();
-      
-      if (catError) {
-        console.error('Error fetching category:', catError);
-        return;
-      }
-
       const { data, error } = await supabase
         .from('media')
-        .select(`
-          *,
-          categories!inner(name, slug)
-        `)
+        .select('*')
         .eq('media_type', 'video')
-        .eq('category_id', categories.id)
+        .eq('category_id', catId)
         .order('created_at', { ascending: false });
       
       if (error) {
-        console.error('Fetch error from', supabase.supabaseUrl + '/rest/v1/media?select=*&media_type=eq.video&category_id=eq.' + categories.id + '&order=created_at.desc:', error);
         console.error('Error fetching videos:', error);
         return;
       }

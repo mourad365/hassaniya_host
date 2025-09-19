@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau des Commandes - Directeur des Achats</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .language-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .language-toggle button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        
+        .language-toggle button.active {
+            background: #3498db;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .command-table {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+        }
+        
+        .table-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-delivered {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+        
+        .status-ordered {
+            color: #f39c12;
+            font-weight: 600;
+        }
+        
+        .status-delayed {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .status-negotiation {
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .status-quotes {
+            color: #9b59b6;
+            font-weight: 600;
+        }
+        
+        .status-urgent {
+            color: #e74c3c;
+            font-weight: 700;
+            background-color: #ffeded;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .alert-footer {
+            background-color: #fff3e0;
+            padding: 15px;
+            text-align: center;
+            border-top: 2px solid #f39c12;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        
+        .arabic-table {
+            direction: rtl;
+        }
+        
+        .arabic-table th, .arabic-table td {
+            text-align: right;
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button id="show-french" class="active">Version Française</button>
+        <button id="show-arabic">Version Arabe</button>
+        <button id="show-both">Afficher les Deux</button>
+    </div>
+    
+    <div class="container">
+        <div class="command-table french-version">
+            <div class="table-header">
+                <h1>TABLEAU DES COMMANDES - DIRECTEUR ACHAT</h1>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>PROJET</th>
+                        <th>MATÉRIEL</th>
+                        <th>QUANTITÉ</th>
+                        <th>STATUT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">Tour Lumia</td>
+                        <td>Ciment CPJ45</td>
+                        <td>450 sacs</td>
+                        <td class="status-delivered">✅ LIVRÉ (15/08)</td>
+                    </tr>
+                    <tr>
+                        <td>Acier HA500</td>
+                        <td>8.5 tonnes</td>
+                        <td class="status-ordered">🟡 EN COMMANDE</td>
+                    </tr>
+                    <tr>
+                        <td>Vibrateur</td>
+                        <td>2 unités</td>
+                        <td class="status-delivered">✅ LIVRÉ (18/08)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Résidence Riviera</td>
+                        <td>Briques</td>
+                        <td>25,000 u</td>
+                        <td class="status-delayed">🔴 EN RETARD (⚠️)</td>
+                    </tr>
+                    <tr>
+                        <td>Bois Charpente</td>
+                        <td>300 m²</td>
+                        <td class="status-negotiation">🟡 EN NÉGOCIATION</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">Pont Horizon</td>
+                        <td>Béton Prêt à l'emploi</td>
+                        <td>120 m³</td>
+                        <td class="status-quotes">🟡 DEVIS REÇUS</td>
+                    </tr>
+                    <tr>
+                        <td>Compacteur</td>
+                        <td>1 unité</td>
+                        <td class="status-urgent">🔴 BESOIN URGENT (⚠️)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="alert-footer">
+                ALERTES: 2 COMMANDES REQUIÈRENT ATTENTION
+            </div>
+        </div>
+        
+        <div class="command-table arabic-table arabic-version">
+            <div class="table-header">
+                <h1>جدول الطلبيات - مدير المشتريات</h1>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>المشروع</th>
+                        <th>المواد</th>
+                        <th>الكمية</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">برج لوميا</td>
+                        <td>أسمنت CPJ45</td>
+                        <td>450 كيس</td>
+                        <td class="status-delivered">✅ تم التوصيل (15/08)</td>
+                    </tr>
+                    <tr>
+                        <td>حديد HA500</td>
+                        <td>8.5 طن</td>
+                        <td class="status-ordered">🟡 قيد الطلب</td>
+                    </tr>
+                    <tr>
+                        <td>هزاز</td>
+                        <td>2 وحدة</td>
+                        <td class="status-delivered">✅ تم التوصيل (18/08)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">إقامة ريفيرا</td>
+                        <td>طوب</td>
+                        <td>25,000 وحدة</td>
+                        <td class="status-delayed">🔴 متأخر (⚠️)</td>
+                    </tr>
+                    <tr>
+                        <td>خشب للهيكل</td>
+                        <td>300 م²</td>
+                        <td class="status-negotiation">🟡 قيد التفاوض</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">جسر هورايزون</td>
+                        <td>خرسانة جاهزة</td>
+                        <td>120 م³</td>
+                        <td class="status-quotes">🟡 تم استلام عروض الأسعار</td>
+                    </tr>
+                    <tr>
+                        <td>مضغوط</td>
+                        <td>1 وحدة</td>
+                        <td class="status-urgent">🔴 حاجة ملحة (⚠️)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="alert-footer">
+                تنبيه: 2 طلبيات تحتاج إلى اهتمام عاجل
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const frenchVersion = document.querySelector('.french-version');
+            const arabicVersion = document.querySelector('.arabic-version');
+            const showFrenchBtn = document.getElementById('show-french');
+            const showArabicBtn = document.getElementById('show-arabic');
+            const showBothBtn = document.getElementById('show-both');
+            
+            // Initial state - show both
+            showBoth();
+            
+            showFrenchBtn.addEventListener('click', showFrench);
+            showArabicBtn.addEventListener('click', showArabic);
+            showBothBtn.addEventListener('click', showBoth);
+            
+            function showFrench() {
+                frenchVersion.style.display = 'block';
+                arabicVersion.style.display = 'none';
+                showFrenchBtn.classList.add('active');
+                showArabicBtn.classList.remove('active');
+                showBothBtn.classList.remove('active');
+            }
+            
+            function showArabic() {
+                frenchVersion.style.display = 'none';
+                arabicVersion.style.display = 'block';
+                showFrenchBtn.classList.remove('active');
+                showArabicBtn.classList.add('active');
+                showBothBtn.classList.remove('active');
+            }
+            
+            function showBoth() {
+                frenchVersion.style.display = 'block';
+                arabicVersion.style.display = 'block';
+                showFrenchBtn.classList.remove('active');
+                showArabicBtn.classList.remove('active');
+                showBothBtn.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

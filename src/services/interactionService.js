@@ -96,10 +96,7 @@ export const commentService = {
           parent_id: parentId,
           status: 'published'
         })
-        .select(`
-          *,
-          user:auth.users(email)
-        `)
+        .select('*')
         .single();
       
       if (error) throw error;
@@ -114,10 +111,7 @@ export const commentService = {
     try {
       const { data, error } = await supabase
         .from('comments')
-        .select(`
-          *,
-          user:auth.users(email)
-        `)
+        .select('*')
         .eq('target_type', targetType)
         .eq('target_id', targetId)
         .eq('status', 'published')
@@ -422,9 +416,17 @@ export const viewService = {
       
       if (error) {
         // Fallback to manual increment if RPC doesn't exist
+        // Fallback: read current count and increment
+        const { data: currentData } = await supabase
+          .from(tableName)
+          .select('view_count')
+          .eq('id', targetId)
+          .single();
+        
+        const currentCount = currentData?.view_count || 0;
         const { error: updateError } = await supabase
           .from(tableName)
-          .update({ view_count: supabase.raw('COALESCE(view_count, 0) + 1') })
+          .update({ view_count: currentCount + 1 })
           .eq('id', targetId);
         
         if (updateError) throw updateError;

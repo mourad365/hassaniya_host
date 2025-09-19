@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, MessageCircle, Share2, Bookmark, Play, Calendar, User, Eye } from 'lucide-react';
+import { Calendar, User } from 'lucide-react';
 import { contentService } from '@/services/contentService';
-import { likeService, commentService, shareService, bookmarkService } from '@/services/interactionService';
+import BunnyVideoPlayer from './BunnyVideoPlayer';
+import { getBunnyImageUrl } from '@/utils/bunnyImageUtils';
 
 const ContentDetail = ({ contentType }) => {
   const { slug } = useParams();
@@ -19,24 +19,11 @@ const ContentDetail = ({ contentType }) => {
 
   const [content, setContent] = useState(null);
   const [relatedContent, setRelatedContent] = useState([]);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
-  const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [submittingComment, setSubmittingComment] = useState(false);
 
   useEffect(() => {
     fetchContent();
   }, [slug, contentType]);
-
-  useEffect(() => {
-    if (content && user) {
-      checkUserInteractions();
-    }
-  }, [content, user]);
 
   const fetchContent = async () => {
     try {
@@ -70,18 +57,9 @@ const ContentDetail = ({ contentType }) => {
 
       setContent(data);
 
-      // Fetch related content, comments, and interaction counts
-      const [related, commentsData, likes, commentsCount] = await Promise.all([
-        contentService.getRelatedContent(contentType, data.category_id, data.id),
-        commentService.getComments(contentType, data.id),
-        likeService.getLikeCount(contentType, data.id),
-        commentService.getCommentCount(contentType, data.id)
-      ]);
-
+      // Fetch related content only
+      const related = await contentService.getRelatedContent(contentType, data.category_id, data.id);
       setRelatedContent(related);
-      setComments(commentsData);
-      setLikeCount(likes);
-      setCommentCount(commentsCount);
     } catch (error) {
       console.error('Error fetching content:', error);
       toast({
@@ -95,134 +73,6 @@ const ContentDetail = ({ contentType }) => {
     }
   };
 
-  const checkUserInteractions = async () => {
-    if (!user || !content) return;
-
-    try {
-      const [liked, bookmarked] = await Promise.all([
-        likeService.isLikedByUser(contentType, content.id, user.id),
-        bookmarkService.isBookmarkedByUser(contentType, content.id, user.id)
-      ]);
-
-      setIsLiked(liked);
-      setIsBookmarked(bookmarked);
-    } catch (error) {
-      console.error('Error checking user interactions:', error);
-    }
-  };
-
-  const handleLike = async () => {
-    if (!user) {
-      toast({
-        title: "تسجيل الدخول مطلوب",
-        description: "يجب تسجيل الدخول للإعجاب بالمحتوى"
-      });
-      return;
-    }
-
-    try {
-      const result = await likeService.toggleLike(contentType, content.id, user.id);
-      setIsLiked(result.liked);
-      setLikeCount(prev => result.liked ? prev + 1 : prev - 1);
-      
-      toast({
-        title: result.liked ? "تم الإعجاب" : "تم إلغاء الإعجاب",
-        description: result.liked ? "تمت إضافة إعجابك" : "تم إلغاء إعجابك"
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "فشل في تحديث الإعجاب"
-      });
-    }
-  };
-
-  const handleBookmark = async () => {
-    if (!user) {
-      toast({
-        title: "تسجيل الدخول مطلوب",
-        description: "يجب تسجيل الدخول لحفظ المحتوى"
-      });
-      return;
-    }
-
-    try {
-      const result = await bookmarkService.toggleBookmark(contentType, content.id, user.id);
-      setIsBookmarked(result.bookmarked);
-      
-      toast({
-        title: result.bookmarked ? "تم الحفظ" : "تم إلغاء الحفظ",
-        description: result.bookmarked ? "تم حفظ المحتوى" : "تم إلغاء حفظ المحتوى"
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "فشل في تحديث الحفظ"
-      });
-    }
-  };
-
-  const handleShare = async (platform) => {
-    try {
-      await shareService.shareToSocial(
-        contentType,
-        content.id,
-        content.title,
-        platform,
-        user?.id
-      );
-    } catch (error) {
-      console.error('Share error:', error);
-    }
-  };
-
-  const handleAddComment = async () => {
-    if (!user) {
-      toast({
-        title: "تسجيل الدخول مطلوب",
-        description: "يجب تسجيل الدخول للتعليق"
-      });
-      return;
-    }
-
-    if (!newComment.trim()) {
-      toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "يرجى كتابة تعليق"
-      });
-      return;
-    }
-
-    try {
-      setSubmittingComment(true);
-      const comment = await commentService.addComment(
-        contentType,
-        content.id,
-        newComment,
-        user.id
-      );
-
-      setComments(prev => [...prev, comment]);
-      setCommentCount(prev => prev + 1);
-      setNewComment('');
-      
-      toast({
-        title: "تم إضافة التعليق",
-        description: "تم نشر تعليقك بنجاح"
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "فشل في إضافة التعليق"
-      });
-    } finally {
-      setSubmittingComment(false);
-    }
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ar-SA', {
@@ -269,84 +119,34 @@ const ContentDetail = ({ contentType }) => {
               </div>
             )}
             
-            {content.view_count && (
-              <div className="flex items-center gap-2">
-                <Eye size={16} />
-                <span>{content.view_count} مشاهدة</span>
-              </div>
-            )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 mb-6">
-            <Button
-              variant={isLiked ? "default" : "outline"}
-              size="sm"
-              onClick={handleLike}
-              className="flex items-center gap-2"
-            >
-              <Heart size={16} className={isLiked ? "fill-current" : ""} />
-              <span>{likeCount}</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' })}
-              className="flex items-center gap-2"
-            >
-              <MessageCircle size={16} />
-              <span>{commentCount}</span>
-            </Button>
-
-            <Button
-              variant={isBookmarked ? "default" : "outline"}
-              size="sm"
-              onClick={handleBookmark}
-              className="flex items-center gap-2"
-            >
-              <Bookmark size={16} className={isBookmarked ? "fill-current" : ""} />
-            </Button>
-
-            <div className="flex gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleShare('facebook')}
-                className="px-3"
-              >
-                Facebook
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleShare('twitter')}
-                className="px-3"
-              >
-                Twitter
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleShare('whatsapp')}
-                className="px-3"
-              >
-                WhatsApp
-              </Button>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Featured Image */}
-            {content.image_url && (
+            {content.image_url && content.image_url.trim() !== '' && (
               <div className="mb-6">
                 <img
-                  src={content.image_url}
+                  src={getBunnyImageUrl(content.image_url)}
                   alt={content.title}
                   className="w-full h-64 md:h-96 object-cover rounded-lg shadow-md"
+                  onError={(e) => {
+                    console.log('ContentDetail - Image failed to load:', {
+                      original: content.image_url,
+                      bunnyUrl: getBunnyImageUrl(content.image_url)
+                    });
+                    e.target.style.display = 'none';
+                    e.target.parentElement.style.display = 'none';
+                  }}
+                  onLoad={() => {
+                    console.log('ContentDetail - Image loaded successfully:', {
+                      original: content.image_url,
+                      bunnyUrl: getBunnyImageUrl(content.image_url)
+                    });
+                  }}
                 />
               </div>
             )}
@@ -355,14 +155,27 @@ const ContentDetail = ({ contentType }) => {
             {(content.audio_url || content.video_url) && (
               <div className="mb-6">
                 {content.video_url ? (
-                  <video
-                    controls
-                    className="w-full rounded-lg shadow-md"
-                    poster={content.image_url}
-                  >
-                    <source src={content.video_url} type="video/mp4" />
-                    متصفحك لا يدعم تشغيل الفيديو
-                  </video>
+                  // Check if it's a Bunny CDN video (contains bunny cdn hostname or video ID pattern)
+                  content.video_url.includes('bunnycdn.com') || content.video_url.includes('b-cdn.net') || 
+                  /^[a-f0-9-]{36}$/i.test(content.video_url) ? (
+                    <BunnyVideoPlayer
+                      videoId={content.video_url.includes('http') ? 
+                        content.video_url.split('/').pop().replace(/\.(mp4|webm|ogg)$/, '') : 
+                        content.video_url}
+                      title={content.title}
+                      poster={getBunnyImageUrl(content.image_url)}
+                      className="w-full aspect-video rounded-lg shadow-md"
+                    />
+                  ) : (
+                    <video
+                      controls
+                      className="w-full rounded-lg shadow-md"
+                      poster={getBunnyImageUrl(content.image_url)}
+                    >
+                      <source src={content.video_url} type="video/mp4" />
+                      متصفحك لا يدعم تشغيل الفيديو
+                    </video>
+                  )
                 ) : content.audio_url ? (
                   <audio
                     controls
@@ -378,74 +191,6 @@ const ContentDetail = ({ contentType }) => {
             {/* Content Body */}
             <div className="prose prose-lg max-w-none arabic-body mb-8">
               {content.content || content.description}
-            </div>
-
-            {/* Comments Section */}
-            <div id="comments" className="mt-12">
-              <h3 className="text-2xl font-bold arabic-title mb-6">
-                التعليقات ({commentCount})
-              </h3>
-
-              {/* Add Comment Form */}
-              {user ? (
-                <Card className="mb-6">
-                  <CardContent className="pt-6">
-                    <Textarea
-                      placeholder="اكتب تعليقك هنا..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      className="mb-4 arabic-body"
-                      rows={3}
-                    />
-                    <Button
-                      onClick={handleAddComment}
-                      disabled={submittingComment || !newComment.trim()}
-                      className="btn-heritage"
-                    >
-                      {submittingComment ? 'جاري النشر...' : 'نشر التعليق'}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card className="mb-6">
-                  <CardContent className="pt-6 text-center">
-                    <p className="arabic-body text-gray-600 mb-4">
-                      يجب تسجيل الدخول للتعليق
-                    </p>
-                    <Button onClick={() => navigate('/login')} className="btn-heritage">
-                      تسجيل الدخول
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Comments List */}
-              <div className="space-y-4">
-                {comments.map((comment) => (
-                  <Card key={comment.id}>
-                    <CardContent className="pt-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="font-semibold text-sm">
-                          {comment.user?.email?.split('@')[0] || 'مستخدم'}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(comment.created_at)}
-                        </span>
-                      </div>
-                      <p className="arabic-body text-gray-700">
-                        {comment.content}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-                
-                {comments.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <MessageCircle size={48} className="mx-auto mb-4 opacity-50" />
-                    <p className="arabic-body">لا توجد تعليقات بعد</p>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
@@ -465,11 +210,24 @@ const ContentDetail = ({ contentType }) => {
                         className="cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors"
                         onClick={() => navigate(`/${contentType}s/${item.page_slug}`)}
                       >
-                        {item.image_url && (
+                        {item.image_url && item.image_url.trim() !== '' && (
                           <img
-                            src={item.image_url}
+                            src={getBunnyImageUrl(item.image_url)}
                             alt={item.title}
                             className="w-full h-24 object-cover rounded mb-2"
+                            onError={(e) => {
+                              console.log('ContentDetail - Related content image failed to load:', {
+                                original: item.image_url,
+                                bunnyUrl: getBunnyImageUrl(item.image_url)
+                              });
+                              e.target.style.display = 'none';
+                            }}
+                            onLoad={() => {
+                              console.log('ContentDetail - Related content image loaded successfully:', {
+                                original: item.image_url,
+                                bunnyUrl: getBunnyImageUrl(item.image_url)
+                              });
+                            }}
                           />
                         )}
                         <h4 className="font-semibold text-sm arabic-title line-clamp-2 mb-1">

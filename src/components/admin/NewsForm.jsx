@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { uploadToBunny } from '@/services/mediaService';
+import LocalizedFileInput from '@/components/ui/LocalizedFileInput';
 
 const formSchema = z.object({
   title: z.string().min(5, { message: 'العنوان يجب أن يكون 5 أحرف على الأقل' }),
@@ -77,18 +78,44 @@ const NewsForm = ({ item, onSuccess, onCancel }) => {
 
     if (imageFile) {
       try {
-        const uploadResult = await uploadToBunny(imageFile, 'news', 'ar');
-        if (uploadResult.success) {
-          imageUrl = uploadResult.url;
-        } else {
-          throw new Error(uploadResult.error || 'Upload failed');
+        // Direct upload to Bunny CDN Storage API
+        // IMPORTANT: Bunny Storage API expects the STORAGE ZONE NAME in the URL path,
+        // and the STORAGE ZONE PASSWORD in the AccessKey header.
+        const fileName = `news/${Date.now()}-${imageFile.name}`;
+        const storageZoneName = (import.meta.env.VITE_BUNNY_STORAGE_ZONE_NAME || import.meta.env.VITE_BUNNY_STORAGE_ZONE || '').trim();
+        const storagePassword = (import.meta.env.VITE_BUNNY_STORAGE_PASSWORD || import.meta.env.VITE_BUNNY_STORAGE_API_KEY || '').trim();
+        const cdnUrl = (import.meta.env.VITE_BUNNY_CDN_URL || '').trim();
+
+        if (!storageZoneName || !storagePassword || !cdnUrl) {
+          throw new Error('Bunny Storage configuration is missing (zone name / password / CDN URL)');
         }
+
+        const uploadUrl = `https://storage.bunnycdn.com/${storageZoneName}/${fileName}`;
+        const uploadResponse = await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: {
+            'AccessKey': storagePassword,
+            'Content-Type': imageFile.type,
+          },
+          body: imageFile,
+        });
+
+        if (!uploadResponse.ok) {
+          const errText = await uploadResponse.text().catch(() => '');
+          throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText} ${errText}`);
+        }
+
+        // Construct the Bunny CDN URL
+        imageUrl = `${cdnUrl}/${fileName}`;
+
+        console.log('Image uploaded successfully:', { uploadUrl, imageUrl });
+
       } catch (error) {
-        console.warn('Image upload error:', error);
+        console.error('Image upload error:', error);
         toast({ 
-          variant: "default", 
-          title: "تحذير", 
-          description: "تم حفظ الخبر بدون صورة. مشكلة في رفع الصورة." 
+          variant: "destructive", 
+          title: "خطأ في رفع الصورة", 
+          description: `فشل في رفع الصورة: ${error.message}. سيتم حفظ الخبر بدون صورة.` 
         });
         imageUrl = null;
       }
@@ -290,7 +317,7 @@ const NewsForm = ({ item, onSuccess, onCancel }) => {
             <FormItem>
               <FormLabel className="arabic-font">صورة الخبر</FormLabel>
               <FormControl>
-                <Input type="file" accept="image/*" onChange={handleImageChange} className="arabic-body" />
+                <LocalizedFileInput accept="image/*" onChange={(files) => setImageFile(files && files[0])} />
               </FormControl>
               <FormMessage />
             </FormItem>

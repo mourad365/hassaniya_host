@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { uploadToBunny } from '@/services/mediaService';
+import LocalizedFileInput from '@/components/ui/LocalizedFileInput';
 
 const formSchema = z.object({
   title: z.string().min(5, { message: 'العنوان يجب أن يكون 5 أحرف على الأقل' }),
@@ -22,7 +22,7 @@ const formSchema = z.object({
   image: z.any().optional(),
 });
 
-const ArticleForm = ({ article, onSuccess, onCancel }) => {
+const ArticleForm = ({ onSuccess, onCancel }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -32,24 +32,12 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: article?.title || '',
-      content: article?.content || '',
-      excerpt: article?.excerpt || '',
-      category_id: article?.category_id ? String(article.category_id) : '',
+      title: '',
+      content: '',
+      excerpt: '',
+      category_id: '',
     },
   });
-
-  // Update form when article changes
-  useEffect(() => {
-    if (article) {
-      form.reset({
-        title: article.title || '',
-        content: article.content || '',
-        excerpt: article.excerpt || '',
-        category_id: article.category_id ? String(article.category_id) : '',
-      });
-    }
-  }, [article, form]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -73,14 +61,23 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
 
     if (imageFile) {
       try {
-        // Upload using secure server-side method
-        const uploadResult = await uploadToBunny(imageFile, 'thumbnails', 'ar');
+        const fileName = `${Date.now()}_${imageFile.name}`;
         
-        if (uploadResult.success) {
-          imageUrl = uploadResult.url;
-        } else {
-          throw new Error(uploadResult.error || 'Upload failed');
+        // Direct upload to Bunny CDN Storage API
+        const uploadResponse = await fetch(`https://storage.bunnycdn.com/${import.meta.env.VITE_BUNNY_STORAGE_ZONE || 'hassaniya'}/${fileName}`, {
+          method: 'PUT',
+          headers: {
+            'AccessKey': import.meta.env.VITE_BUNNY_STORAGE_API_KEY || 'your-bunny-storage-api-key',
+            'Content-Type': imageFile.type,
+          },
+          body: imageFile,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText}`);
         }
+        
+        imageUrl = `${import.meta.env.VITE_BUNNY_CDN_URL || 'https://hassaniya.b-cdn.net'}/${fileName}`;
         
       } catch (error) {
         console.warn('Image upload error:', error);
@@ -93,62 +90,25 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
       }
     }
 
-    let error;
-    
-    if (article) {
-      // Update existing article
-      const updateData = {
-        title: values.title,
-        content: values.content,
-        excerpt: values.excerpt,
-        category_id: parseInt(values.category_id),
-        page_slug: values.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
-      };
-      
-      // Only update image if a new one was uploaded
-      if (imageUrl) {
-        updateData.image_url = imageUrl;
-      }
-      
-      const result = await supabase
-        .from('articles')
-        .update(updateData)
-        .eq('id', article.id);
-      
-      error = result.error;
-    } else {
-      // Create new article
-      const result = await supabase.from('articles').insert({
-        title: values.title,
-        content: values.content,
-        excerpt: values.excerpt,
-        category_id: parseInt(values.category_id),
-        author_id: user.id,
-        author_name: user.email.split('@')[0],
-        image_url: imageUrl,
-        publish_date: new Date().toISOString().slice(0, 10),
-        status: 'published',
-        page_slug: values.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
-      });
-      
-      error = result.error;
-    }
+    const { error } = await supabase.from('articles').insert({
+      title: values.title,
+      content: values.content,
+      excerpt: values.excerpt,
+      category_id: parseInt(values.category_id),
+      author_id: user.id,
+      author_name: user.email.split('@')[0],
+      image_url: imageUrl,
+      publish_date: new Date().toISOString().slice(0, 10),
+      status: 'published',
+      page_slug: values.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
+    });
 
     if (error) {
-      toast({ 
-        variant: "destructive", 
-        title: article ? "فشل تحديث المقال" : "فشل إنشاء المقال", 
-        description: error.message 
-      });
+      toast({ variant: "destructive", title: "فشل إنشاء المقال", description: error.message });
     } else {
-      toast({ 
-        title: "✅ نجاح", 
-        description: article ? "تم تحديث المقال بنجاح!" : "تم إنشاء المقال بنجاح!" 
-      });
-      if (!article) {
-        form.reset();
-        setImageFile(null);
-      }
+      toast({ title: "✅ نجاح", description: "تم إنشاء المقال بنجاح!" });
+      form.reset();
+      setImageFile(null);
       if (onSuccess) onSuccess();
     }
     setLoading(false);
@@ -157,7 +117,7 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
   return (
     <Card className="heritage-card my-6">
       <CardHeader>
-        <CardTitle className="arabic-title text-2xl">{article ? 'تحرير المقال' : 'مقال جديد'}</CardTitle>
+        <CardTitle className="arabic-title text-2xl">مقال جديد</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -227,7 +187,7 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
               <FormItem>
                 <FormLabel className="arabic-font">صورة المقال</FormLabel>
                 <FormControl>
-                  <Input type="file" accept="image/*" onChange={handleImageChange} className="arabic-body" />
+                  <LocalizedFileInput accept="image/*" onChange={(files) => setImageFile(files && files[0])} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -238,7 +198,7 @@ const ArticleForm = ({ article, onSuccess, onCancel }) => {
               </Button>
               <Button type="submit" className="btn-heritage" disabled={loading}>
                 {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-                {loading ? 'جاري الحفظ...' : (article ? 'تحديث المقال' : 'حفظ المقال')}
+                {loading ? 'جاري الحفظ...' : 'حفظ المقال'}
               </Button>
             </div>
           </form>

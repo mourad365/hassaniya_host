@@ -1,30 +1,58 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import Logo from '@/components/Logo';
+import { newsletterService } from '@/services/interactionService';
 
 const Footer = () => {
   const { t } = useTranslation();
   
-  const handleSocialClick = (platform) => {
-    toast({
-      title: t('socialMedia'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
+  const [email, setEmail] = useState('');
+
+  const socialUrls = {
+    facebook: import.meta.env.VITE_SOCIAL_FACEBOOK_URL,
+    twitter: import.meta.env.VITE_SOCIAL_TWITTER_URL,
+    instagram: import.meta.env.VITE_SOCIAL_INSTAGRAM_URL,
+    youtube: import.meta.env.VITE_SOCIAL_YOUTUBE_URL,
   };
 
-  const handleNewsletterSubmit = (e) => {
+  const handleSocialClick = (platform) => {
+    const url = socialUrls[platform];
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      toast({
+        title: t('socialMedia'),
+        description: t('featureNotImplemented'),
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
-    toast({
-      title: t('newsletter'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({
+        variant: 'destructive',
+        title: t('newsletter'),
+        description: t('invalidEmail') || 'يرجى إدخال بريد إلكتروني صالح',
+      });
+      return;
+    }
+    try {
+      await newsletterService.subscribe(email);
+      toast({ title: t('newsletter'), description: t('subscribed') || 'تم الاشتراك بنجاح' });
+      setEmail('');
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: t('newsletter'),
+        description: err?.message || t('subscriptionFailed') || 'فشل الاشتراك',
+      });
+    }
   };
 
   const quickLinks = [
@@ -50,7 +78,11 @@ const Footer = () => {
           {/* About Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3 space-x-reverse">
-              <Logo variant="white" size="sm" />
+              <img
+                src="/WHAITE LOGO.png"
+                alt="شعار الحسانية"
+                className="h-10 w-auto object-contain"
+              />
               <div>
                 <span className="text-xl font-bold arabic-title">{t('siteName')}</span>
                 <p className="text-sm text-black modern-font">HASSANIYA</p>
@@ -63,16 +95,16 @@ const Footer = () => {
             {/* Social Media */}
             <div className="flex space-x-4 space-x-reverse">
               {[
-                { icon: Facebook, name: 'فيسبوك' },
-                { icon: Twitter, name: 'تويتر' },
-                { icon: Instagram, name: 'إنستغرام' },
-                { icon: Youtube, name: 'يوتيوب' }
-              ].map(({ icon: Icon, name }) => (
+                { icon: Facebook, key: 'facebook', name: 'فيسبوك' },
+                { icon: Twitter, key: 'twitter', name: 'تويتر' },
+                { icon: Instagram, key: 'instagram', name: 'إنستغرام' },
+                { icon: Youtube, key: 'youtube', name: 'يوتيوب' }
+              ].map(({ icon: Icon, key, name }) => (
                 <motion.button
-                  key={name}
+                  key={key}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => handleSocialClick(t(name.toLowerCase()))}
+                  onClick={() => handleSocialClick(key)}
                   className="w-10 h-10 bg-[var(--heritage-gold)] rounded-full flex items-center justify-center text-white hover:bg-[var(--desert-brown)] transition-colors"
                 >
                   <Icon size={18} />
@@ -125,41 +157,12 @@ const Footer = () => {
               {t('stayConnected')}
             </span>
             
-            {/* Newsletter */}
-            <form onSubmit={handleNewsletterSubmit} className="space-y-3">
-              <p className="text-black text-sm arabic-body">
-                {t('subscribeNewsletter')}
-              </p>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder={t('emailPlaceholder')}
-                  className="flex-1 px-3 py-2 bg-white text-black rounded-r-lg border border-[var(--desert-brown)] focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] arabic-body"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-black text-white rounded-l-lg hover:bg-black transition-colors"
-                >
-                  <Mail size={18} />
-                </button>
-              </div>
-            </form>
-
+          
             {/* Contact Info */}
-            <div className="space-y-2 text-sm">
+           
               <div className="flex items-center space-x-2 space-x-reverse text-black">
-                <Mail size={16} />
-                <span className="modern-font">info@hassaniya.com</span>
+            
               </div>
-              <div className="flex items-center space-x-2 space-x-reverse text-black">
-                <Phone size={16} />
-                <span className="modern-font">+971 XX XXX XXXX</span>
-              </div>
-              <div className="flex items-center space-x-2 space-x-reverse text-black">
-                <MapPin size={16} />
-                <span className="arabic-body">{t('uae')}</span>
-              </div>
-            </div>
           </div>
         </div>
 

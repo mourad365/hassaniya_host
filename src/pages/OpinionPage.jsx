@@ -7,91 +7,35 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/use-language';
-import { supabase } from '@/lib/customSupabaseClient';
+import { useNavigate } from 'react-router-dom';
+import { shareService, newsletterService } from '@/services/interactionService';
 
 const OpinionPage = () => {
   const { t, language, isRTL } = useLanguage();
+  const navigate = useNavigate();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(t('all'));
 
   const { data: articles = [], isLoading } = useQuery({
-    queryKey: ['articles', { category: 'opinion' }],
+    queryKey: ['/api/articles', { category: 'opinion' }],
     queryFn: async () => {
-      // Get opinion category ID first
-      const { data: opinionCategories, error: catError } = await supabase
-        .from('categories')
-        .select('id, slug')
-        .eq('type', 'opinion');
-      
-      // If no opinion categories exist, return mock data
-      if (catError || !opinionCategories || opinionCategories.length === 0) {
-        console.warn('Opinion categories not found, returning mock data');
-        return [
-          {
-            id: 1,
-            title: "رأي في القضايا المعاصرة",
-            excerpt: "تحليل معمق للقضايا الراهنة من منظور حساني أصيل",
-            author: "د. أحمد ولد محمد",
-            authorBio: "كاتب وباحث في الشؤون السياسية",
-            date: "2024-01-15",
-            views: 1234,
-            likes: 45,
-            comments: 12,
-            readTime: "5 دقائق",
-            category: "رأي سياسي",
-            featured: true,
-            author_image: "/LOGO.png"
-          },
-          {
-            id: 2,
-            title: "نحو تطوير التعليم الحساني",
-            excerpt: "مقترحات عملية لتطوير منظومة التعليم باللغة الحسانية",
-            author: "فاطمة بنت أحمد",
-            authorBio: "خبيرة في التربية والتعليم",
-            date: "2024-01-10",
-            views: 987,
-            likes: 32,
-            comments: 8,
-            readTime: "7 دقائق",
-            category: "رأي تعليمي",
-            featured: false,
-            author_image: "/LOGO.png"
-          }
-        ];
+      const response = await fetch('/api/articles?category=opinion');
+      if (!response.ok) {
+        throw new Error('Failed to fetch articles');
       }
-
-      // Get category IDs for the IN query
-      const categoryIds = opinionCategories.map(cat => cat.id);
-
-      const { data, error } = await supabase
-        .from('articles')
-        .select(`
-          *,
-          categories!inner(name, slug)
-        `)
-        .in('category_id', categoryIds)
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.warn('Failed to fetch articles from database:', error);
-        return [];
-      }
-      
-      return data || [];
+      return response.json();
     }
   });
 
   const { data: categories = [] } = useQuery({
-    queryKey: ['categories', 'opinion'],
+    queryKey: ['/api/categories'],
     queryFn: async () => {
-      // Always return the Arabic categories for opinion page
-      return [
-        t('all'),
-        'رأي سياسي',
-        'رأي اجتماعي', 
-        'رأي ثقافي',
-        'رأي اقتصادي'
-      ];
+      const response = await fetch('/api/categories');
+      if (!response.ok) {
+        return [t('all')];
+      }
+      const data = await response.json();
+      return [t('all'), ...data.map(cat => language === 'ar' ? cat.name : cat.nameFr || cat.name)];
     }
   });
 
@@ -104,20 +48,18 @@ const OpinionPage = () => {
 
   const featuredArticles = articles.filter(article => article.featured);
 
-  const handleShare = (title) => {
-    toast({
-      title: t('shareArticle'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
+  const handleShare = async (id, title) => {
+    try {
+      await shareService.shareToSocial('article', id, title, 'facebook');
+    } catch (e) {
+      console.warn('Share failed', e);
+    }
   };
 
-  const handleReadMore = (id, title) => {
-    toast({
-      title: t('readArticle'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
+  const handleReadMore = (slugOrId) => {
+    if (slugOrId) {
+      navigate(`/articles/${slugOrId}`);
+    }
   };
 
   const handleLike = (id, title) => {
@@ -207,7 +149,7 @@ const OpinionPage = () => {
                       onClick={() => setSelectedCategory(category)}
                       className={`px-4 py-2 rounded-full text-sm modern-font transition-all duration-300 ${
                         selectedCategory === category
-                          ? 'bg-[var(--heritage-gold)] text-black shadow-lg scale-105'
+                          ? 'bg-[var(--heritage-gold)] text-white shadow-lg scale-105'
                           : 'bg-white/80 text-[var(--tent-black)] hover:bg-[var(--sand-medium)] hover:scale-102'
                       }`}
                     >
@@ -510,13 +452,7 @@ const OpinionPage = () => {
                 transition={{ duration: 0.6, delay: 0.8 }}
                 className="heritage-card bg-white text-black"
               >
-                <h3 className="text-xl font-bold arabic-title mb-4 flex items-center space-x-2 space-x-reverse">
-                  <Send size={20} />
-                  <span>{t('weeklyNewsletter')}</span>
-                </h3>
-                <p className="arabic-body mb-4 text-sm">
-                  {t('newsletterDescription')}
-                </p>
+               
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();

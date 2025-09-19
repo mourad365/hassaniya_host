@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { uploadToBunny } from '@/services/mediaService';
+import LocalizedFileInput from '@/components/ui/LocalizedFileInput';
 
 const formSchema = z.object({
   title: z.string().min(5, { message: 'العنوان يجب أن يكون 5 أحرف على الأقل' }),
@@ -290,7 +291,7 @@ const CoverageForm = ({ item, onSuccess, onCancel }) => {
               <FormItem>
                 <FormLabel className="arabic-font">صورة التغطية</FormLabel>
                 <FormControl>
-                  <Input type="file" accept="image/*" onChange={handleImageChange} className="arabic-body" />
+                  <LocalizedFileInput accept="image/*" onChange={(files) => setImageFile(files && files[0])} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -298,7 +299,7 @@ const CoverageForm = ({ item, onSuccess, onCancel }) => {
               <FormItem>
                 <FormLabel className="arabic-font">فيديو التغطية (اختياري)</FormLabel>
                 <FormControl>
-                  <Input type="file" accept="video/*" onChange={handleVideoChange} className="arabic-body" />
+                  <LocalizedFileInput accept="video/*" onChange={(files) => setVideoFile(files && files[0])} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

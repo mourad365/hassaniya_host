@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du Projet Tour Lumia - Bilingue</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .language-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .language-toggle button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        
+        .language-toggle button.active {
+            background: #3498db;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .project-detail {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .project-header {
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .project-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .project-engineer {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .project-nav {
+            background: #34495e;
+            padding: 10px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .project-content {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .plan-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .plan-name {
+            font-size: 14px;
+        }
+        
+        .status-check {
+            color: #2ecc71;
+            font-size: 16px;
+        }
+        
+        .needs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .need-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .need-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .need-value {
+            font-size: 16px;
+        }
+        
+        .deadline {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .command-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .command-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .command-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .command-details {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .command-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: #e8f5e9;
+            color: #2ecc71;
+        }
+        
+        .status-pending {
+            background: #fff3e0;
+            color: #f39c12;
+        }
+        
+        .daily-entry {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .entry-date {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .entry-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .entry-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .entry-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .entry-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .arabic-detail {
+            direction: rtl;
+        }
+        
+        .arabic-detail .plan-item,
+        .arabic-detail .need-item {
+            border-left: none;
+            border-right: 4px solid #3498db;
+        }
+        
+        .arabic-detail .section-title i {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .project-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .plans-grid, .needs-grid, .commands-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .entry-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button id="show-french" class="active">Version Française</button>
+        <button id="show-arabic">Version Arabe</button>
+        <button id="show-both">Afficher les Deux</button>
+    </div>
+    
+    <div class="container">
+        <div class="project-detail french-version">
+            <div class="project-header">
+                <div class="project-title">PROJET: TOUR LUMIA - ÉTAGE 12/20</div>
+                <div class="project-engineer">Ingénieur: Pierre Martin</div>
+            </div>
+            
+            <div class="project-nav">
+                <a href="#" class="nav-item">[PLANS]</a>
+                <a href="#" class="nav-item">[QUANTITÉS]</a>
+                <a href="#" class="nav-item">[PLANNING]</a>
+                <a href="#" class="nav-item">[COMMANDES]</a>
+                <a href="#" class="nav-item">[SUIVI QUOTIDIEN]</a>
+            </div>
+            
+            <div class="project-content">
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-drafting-compass"></i>
+                        PLANS IMPORTÉS:
+                    </div>
+                    <div class="plans-grid">
+                        <div class="plan-item">
+                            <span class="plan-name">Fondation.dwg</span>
+                            <span class="status-check">✅</span>
+                        </div>
+                        <div class="plan-item">
+                            <span class="plan-name">Étage_12.pdf</span>
+                            <span class="status-check">✅</span>
+                        </div>
+                        <div class="plan-item">
+                            <span class="plan-name">Coupe_A-A.pdf</span>
+                            <span class="status-check">✅</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-calculator"></i>
+                        BESOINS CALCULÉS (Automatique):
+                    </div>
+                    <div class="needs-grid">
+                        <div class="need-item">
+                            <div class="need-name">Béton</div>
+                            <div class="need-value">225 m³</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">Acier</div>
+                            <div class="need-value">8.5 tonnes</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">Briques</div>
+                            <div class="need-value">12,400 u</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">Bois</div>
+                            <div class="need-value">180 m²</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">Main d'œuvre</div>
+                            <div class="need-value">280 h</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">Échéance</div>
+                            <div class="need-value deadline">15/09/2024</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-file-invoice"></i>
+                        COMMANDES GÉNÉRÉES:
+                    </div>
+                    <div class="commands-grid">
+                        <div class="command-item">
+                            <div class="command-info">
+                                <div class="command-name">Ciment</div>
+                                <div class="command-details">450 sacs</div>
+                            </div>
+                            <span class="command-status status-completed">✅</span>
+                        </div>
+                        <div class="command-item">
+                            <div class="command-info">
+                                <div class="command-name">Acier</div>
+                                <div class="command-details">8.5T</div>
+                            </div>
+                            <span class="command-status status-pending">⏳</span>
+                        </div>
+                        <div class="command-item">
+                            <div class="command-info">
+                                <div class="command-name">Vibrateur</div>
+                                <div class="command-details">2 unités</div>
+                            </div>
+                            <span class="command-status status-completed">✅</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        SAISIE QUOTIDIENNE:
+                    </div>
+                    <div class="daily-entry">
+                        <div class="entry-header">
+                            <div class="entry-date">Date: 20/08/2024</div>
+                        </div>
+                        <div class="entry-content">
+                            <div class="entry-item">
+                                <div class="entry-label">Béton utilisé</div>
+                                <div class="entry-value">12 m³</div>
+                            </div>
+                            <div class="entry-item">
+                                <div class="entry-label">Stock restant</div>
+                                <div class="entry-value">85 m³</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="project-detail arabic-detail arabic-version">
+            <div class="project-header">
+                <div class="project-title">مشروع: برج لوميا - الطابق 12/20</div>
+                <div class="project-engineer">المهندس: عبد الرحمن أحمد جدو</div>
+            </div>
+            
+            <div class="project-nav">
+                <a href="#" class="nav-item">[المخططات]</a>
+                <a href="#" class="nav-item">[الكميات]</a>
+                <a href="#" class="nav-item">[الجداول]</a>
+                <a href="#" class="nav-item">[الطلبيات]</a>
+                <a href="#" class="nav-item">[المتابعة اليومية]</a>
+            </div>
+            
+            <div class="project-content">
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-drafting-compass"></i>
+                        المخططات المستوردة:
+                    </div>
+                    <div class="plans-grid">
+                        <div class="plan-item">
+                            <span class="plan-name">Fondation.dwg</span>
+                            <span class="status-check">✅</span>
+                        </div>
+                        <div class="plan-item">
+                            <span class="plan-name">Étage_12.pdf</span>
+                            <span class="status-check">✅</span>
+                        </div>
+                        <div class="plan-item">
+                            <span class="plan-name">Coupe_A-A.pdf</span>
+                            <span class="status-check">✅</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-calculator"></i>
+                        الاحتياجات المحسوبة (تلقائي):
+                    </div>
+                    <div class="needs-grid">
+                        <div class="need-item">
+                            <div class="need-name">الخرسانة</div>
+                            <div class="need-value">225 م³</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">الحديد</div>
+                            <div class="need-value">8.5 طن</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">الطوب</div>
+                            <div class="need-value">12,400 وحدة</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">الخشب</div>
+                            <div class="need-value">180 م²</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">اليد العاملة</div>
+                            <div class="need-value">280 ساعة</div>
+                        </div>
+                        <div class="need-item">
+                            <div class="need-name">الموعد النهائي</div>
+                            <div class="need-value deadline">2024/09/15</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-file-invoice"></i>
+                        الطلبيات المُنشأة:
+                    </div>
+                    <div class="commands-grid">
+                        <div class="command-item">
+                            <div class="command-info">
+                                <div class="command-name">الإسمنت</div>
+                                <div class="command-details">450 كيس</div>
+                            </div>
+                            <span class="command-status status-completed">✅</span>
+                        </div>
+                        <div class="command-item">
+                            <div class="command-info">
+                                <div class="command-name">الحديد</div>
+                                <div class="command-details">8.5 طن</div>
+                            </div>
+                            <span class="command-status status-pending">⏳</span>
+                        </div>
+                        <div class="command-item">
+                            <div class="command-info">
+                                <div class="command-name">الهزاز</div>
+                                <div class="command-details">2 وحدة</div>
+                            </div>
+                            <span class="command-status status-completed">✅</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        التسجيل اليومي:
+                    </div>
+                    <div class="daily-entry">
+                        <div class="entry-header">
+                            <div class="entry-date">التاريخ: 2024/08/20</div>
+                        </div>
+                        <div class="entry-content">
+                            <div class="entry-item">
+                                <div class="entry-label">الخرسانة المستخدمة</div>
+                                <div class="entry-value">12 م³</div>
+                            </div>
+                            <div class="entry-item">
+                                <div class="entry-label">المخزون المتبقي</div>
+                                <div class="entry-value">85 م³</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const frenchVersion = document.querySelector('.french-version');
+            const arabicVersion = document.querySelector('.arabic-version');
+            const showFrenchBtn = document.getElementById('show-french');
+            const showArabicBtn = document.getElementById('show-arabic');
+            const showBothBtn = document.getElementById('show-both');
+            
+            // Initial state - show both
+            showBoth();
+            
+            showFrenchBtn.addEventListener('click', showFrench);
+            showArabicBtn.addEventListener('click', showArabic);
+            showBothBtn.addEventListener('click', showBoth);
+            
+            function showFrench() {
+                frenchVersion.style.display = 'block';
+                arabicVersion.style.display = 'none';
+                showFrenchBtn.classList.add('active');
+                showArabicBtn.classList.remove('active');
+                showBothBtn.classList.remove('active');
+            }
+            
+            function showArabic() {
+                frenchVersion.style.display = 'none';
+                arabicVersion.style.display = 'block';
+                showFrenchBtn.classList.remove('active');
+                showArabicBtn.classList.add('active');
+                showBothBtn.classList.remove('active');
+            }
+            
+            function showBoth() {
+                frenchVersion.style.display = 'block';
+                arabicVersion.style.display = 'block';
+                showFrenchBtn.classList.remove('active');
+                showArabicBtn.classList.remove('active');
+                showBothBtn.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
