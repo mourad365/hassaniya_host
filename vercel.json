@@ -2,10 +2,9 @@
   "buildCommand": "npm run build:prod",
   "outputDirectory": "dist",
   "framework": "vite",
-  "functions": {},
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "headers": [
         {
           "key": "X-Frame-Options",
@@ -38,7 +37,7 @@
       ]
     },
     {
-      "source": "/static/(.*)",
+      "source": "/static/:path*",
       "headers": [
         {
           "key": "Cache-Control",
@@ -47,7 +46,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(js|css|woff|woff2|ttf|otf|png|jpg|jpeg|gif|webp|svg))",
+      "source": "/:path*.:ext(js|css|woff|woff2|ttf|otf|png|jpg|jpeg|gif|webp|svg)",
       "headers": [
         {
           "key": "Cache-Control",
