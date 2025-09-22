@@ -7,7 +7,7 @@ import { Calendar, User, Eye, Share2, Globe, MapPin, Clock, TrendingUp, Play, Vi
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import ContributeHeritage from '@/components/home/ContributeHeritage';
-import VideoPlayer from '@/components/VideoPlayer';
+import BunnyVideoPlayer from '@/components/BunnyVideoPlayer';
 import { supabase } from '@/lib/customSupabaseClient';
 
 const PoliticsPage = () => {
@@ -569,11 +569,30 @@ const PoliticsPage = () => {
       </div>
       
       {videoPlayer.isOpen && (
-        <VideoPlayer
-          src={videoPlayer.src}
-          title={videoPlayer.title}
-          onClose={handleCloseVideo}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">{videoPlayer.title}</h3>
+              <button
+                onClick={handleCloseVideo}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="aspect-video">
+              <BunnyVideoPlayer
+                videoId={videoPlayer.src}
+                title={videoPlayer.title}
+                autoplay={true}
+                controls={true}
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

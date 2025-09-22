@@ -42,7 +42,7 @@ const ContentUploadPage = () => {
       id: 'podcast',
       label: 'بودكاست جديد',
       icon: Radio,
-      description: 'رفع حلقة بودكاست صوتية',
+      description: 'رفع حلقة بودكاست كفيديو (والصوت اختياري)',
       component: PodcastForm
     },
     {

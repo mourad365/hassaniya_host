@@ -7,7 +7,8 @@ import { useLanguage } from "@/hooks/use-language";
 import { supabase } from "@/lib/customSupabaseClient";
 import { Link } from "react-router-dom";
 import BunnyVideoPlayer from "@/components/BunnyVideoPlayer";
-import { getBunnyImageUrl } from "@/utils/bunnyImageUtils";
+import { getBunnyImageUrl } from '@/utils/bunnyImageUtils';
+import { getBunnyVideoUrl, debugVideoUrl } from '@/utils/videoUrlUtils';
 
 export default function Programs() {
   const { t, isArabic, isRTL } = useLanguage();
@@ -177,49 +178,59 @@ export default function Programs() {
             </div>
             {/* Body */}
             <div className="p-0 bg-black">
-              {/* Decide which player to render */}
+              {/* Use BunnyVideoPlayer for proper streaming */}
               {activeEpisode.video_url ? (
-                // Check if it's a Bunny CDN video
                 (() => {
                   const videoUrl = activeEpisode.video_url;
-                  const isBunnyVideo = videoUrl.includes('bunnycdn.com') || videoUrl.includes('b-cdn.net') || /^[a-f0-9-]{36}$/i.test(videoUrl);
+                  debugVideoUrl(videoUrl, activeEpisode.title);
                   
-                  console.log('Video analysis:', {
-                    videoUrl,
-                    isBunnyVideo,
-                    cdnHostname: import.meta.env.VITE_BUNNY_VIDEO_CDN_HOSTNAME,
-                    libraryId: import.meta.env.VITE_BUNNY_VIDEO_LIBRARY_ID
-                  });
+                  // Check if it's a Bunny Stream GUID (36 characters with hyphens)
+                  const guidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                  const isBunnyStreamVideo = guidPattern.test(videoUrl);
                   
-                  if (isBunnyVideo) {
-                    const videoId = videoUrl.includes('http') ? 
-                      videoUrl.split('/').pop().replace(/\.(mp4|webm|ogg)$/, '') : 
-                      videoUrl;
-                    
+                  if (isBunnyStreamVideo) {
+                    // Use BunnyVideoPlayer for proper streaming
                     return (
-                      <BunnyVideoPlayer
-                        videoId={videoId}
-                        title={activeEpisode.title}
-                        poster={activeEpisode.image_url ? getBunnyImageUrl(activeEpisode.image_url) : undefined}
-                        className="w-full aspect-video"
-                        autoplay
-                      />
+                      <div className="aspect-video">
+                        <BunnyVideoPlayer
+                          videoId={videoUrl}
+                          title={activeEpisode.title}
+                          poster={activeEpisode.image_url ? getBunnyImageUrl(activeEpisode.image_url) : null}
+                          autoplay={true}
+                          controls={true}
+                          className="w-full h-full"
+                        />
+                      </div>
                     );
                   } else {
+                    // For non-Bunny Stream videos, show a fallback
+                    const fullVideoUrl = getBunnyVideoUrl(videoUrl);
                     return (
-                      <video
-                        controls
-                        autoPlay
-                        className="w-full aspect-video"
-                        poster={activeEpisode.image_url ? getBunnyImageUrl(activeEpisode.image_url) : undefined}
-                        onError={(e) => console.error('Video error:', e)}
-                        onLoadStart={() => console.log('Video load started')}
-                        onLoadedData={() => console.log('Video loaded successfully')}
-                      >
-                        <source src={videoUrl} type="video/mp4" />
-                        <source src={videoUrl} type="video/webm" />
-                        متصفحك لا يدعم تشغيل الفيديو
-                      </video>
+                      <div className="flex flex-col items-center justify-center p-8 text-center text-white bg-black aspect-video">
+                        <div className="mb-4">
+                          {activeEpisode.image_url && (
+                            <img 
+                              src={getBunnyImageUrl(activeEpisode.image_url)} 
+                              alt={activeEpisode.title}
+                              className="w-32 h-32 object-cover rounded-lg mb-4"
+                            />
+                          )}
+                          <h3 className="text-xl font-arabic mb-2">{activeEpisode.title}</h3>
+                          <p className="text-gray-300 mb-6">فيديو محفوظ في Bunny CDN</p>
+                        </div>
+                        
+                        <button
+                          onClick={() => window.open(fullVideoUrl, '_blank')}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                          <Play className="w-5 h-5" />
+                          فتح الفيديو في نافذة جديدة
+                        </button>
+                        
+                        <p className="text-sm text-gray-400 mt-4">
+                          سيتم فتح الفيديو في نافذة جديدة لتجنب قيود CORS
+                        </p>
+                      </div>
                     );
                   }
                 })()

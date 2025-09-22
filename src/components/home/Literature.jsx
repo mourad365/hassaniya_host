@@ -12,6 +12,28 @@ const Literature = () => {
     const [literatureContent, setLiteratureContent] = useState([]);
     const { t } = useLanguage();
 
+    // Fallback content when database is empty
+    const fallbackContent = [
+        {
+            id: 'fallback-1',
+            title: 'من روائع الشعر الحساني',
+            excerpt: 'الشعر الحساني يحمل في طياته عبق التاريخ وجمال الصحراء، حيث تتداخل الكلمات مع نسائم الرمال لتحكي قصص الأجداد وحكايات البطولة والحب.',
+            type: 'شعر',
+            author: 'شاعر حساني',
+            date: new Date().toISOString().split('T')[0],
+            isFallback: true
+        },
+        {
+            id: 'fallback-2',
+            title: 'حكايات من التراث الحساني',
+            excerpt: 'تزخر الثقافة الحسانية بالحكايات الشعبية التي تنقل الحكمة والتجارب عبر الأجيال، وتعكس قيم المجتمع وتقاليده العريقة في قالب أدبي جميل.',
+            type: 'أدب شعبي',
+            author: 'راوي تراثي',
+            date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+            isFallback: true
+        }
+    ];
+
     useEffect(() => {
         const fetchLiteratureContent = async () => {
             try {
@@ -31,6 +53,7 @@ const Literature = () => {
 
                 if (error) {
                     console.error('Error fetching literature content:', error);
+                    setLiteratureContent(fallbackContent);
                     return;
                 }
 
@@ -43,9 +66,15 @@ const Literature = () => {
                     date: article.publish_date
                 })) || [];
 
-                setLiteratureContent(formattedContent);
+                // Use fallback content if no articles found
+                if (formattedContent.length === 0) {
+                    setLiteratureContent(fallbackContent);
+                } else {
+                    setLiteratureContent(formattedContent);
+                }
             } catch (error) {
                 console.error('Error fetching literature content:', error);
+                setLiteratureContent(fallbackContent);
             }
         };
 
@@ -91,6 +120,11 @@ const Literature = () => {
                     <span className="bg-[var(--oasis-blue)] text-white px-3 py-1 rounded-full text-sm modern-font">
                       {content.type}
                     </span>
+                    {content.isFallback && (
+                      <span className="bg-heritage-gold/20 text-heritage-gold px-2 py-1 rounded-full text-xs modern-font">
+                        محتوى تجريبي
+                      </span>
+                    )}
                   </div>
                   
                   <h3 className="text-xl font-bold arabic-title text-[var(--tent-black)] mb-3 hover:text-[var(--heritage-gold)] transition-colors">

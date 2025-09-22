@@ -6,7 +6,9 @@ import { Play, Download, Eye, Share2, Calendar, User, Volume2, Image, Video, Fil
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
-import VideoPlayer from '@/components/VideoPlayer';
+import BunnyVideoPlayer from '@/components/BunnyVideoPlayer';
+import { getBunnyVideoUrl, debugVideoUrl } from '@/utils/videoUrlUtils';
+import { getBunnyImageUrl } from '@/utils/bunnyImageUtils';
 
 const MediaPage = () => {
   const [media, setMedia] = useState([]);
@@ -21,32 +23,23 @@ const MediaPage = () => {
     { id: 'وثائق', label: 'الوثائق', icon: FileText }
   ];
 
-  // Function to generate video thumbnail
-  const generateVideoThumbnail = (videoUrl) => {
-    return new Promise((resolve) => {
-      const video = document.createElement('video');
-      video.crossOrigin = 'anonymous';
-      video.currentTime = 5; // Get thumbnail at 5 seconds
-      
-      video.onloadedmetadata = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 360;
-        
-        video.onseeked = () => {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
-          resolve(thumbnailUrl);
-        };
-      };
-      
-      video.onerror = () => {
-        resolve(null);
-      };
-      
-      video.src = videoUrl;
-    });
+  // Get proper image URL for media thumbnails
+  const getMediaThumbnail = (mediaItem) => {
+    if (mediaItem.image_url) {
+      return getBunnyImageUrl(mediaItem.image_url);
+    }
+    
+    // For Bunny Stream videos, use the CDN thumbnail
+    if (mediaItem.media_type === 'video' && mediaItem.file_url) {
+      const cdnHostname = import.meta.env.VITE_BUNNY_VIDEO_CDN_HOSTNAME;
+      // Check if it's a Bunny Stream GUID
+      const guidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (guidPattern.test(mediaItem.file_url) && cdnHostname) {
+        return `https://${cdnHostname}/${mediaItem.file_url}/thumbnail.jpg`;
+      }
+    }
+    
+    return null;
   };
 
   // Function to get media type in Arabic
@@ -80,14 +73,9 @@ const MediaPage = () => {
           data.map(async (item) => {
             let thumbnailUrl = item.thumbnail_url;
             
-            // Generate thumbnail for videos if not available
-            if (item.media_type === 'video' && item.file_url && !thumbnailUrl) {
-              try {
-                thumbnailUrl = await generateVideoThumbnail(item.file_url);
-              } catch (error) {
-                console.log('Could not generate thumbnail for video:', item.title);
-                thumbnailUrl = null;
-              }
+            // Use proper thumbnail generation without CORS issues
+            if (!thumbnailUrl) {
+              thumbnailUrl = getMediaThumbnail(item);
             }
             
             return {
@@ -129,20 +117,31 @@ const MediaPage = () => {
   const handlePlay = (id, title) => {
     const mediaItem = media.find(item => item.id === id);
     if (mediaItem && mediaItem.file_url) {
+      console.log('MediaPage: Playing media item:', {
+        id,
+        title,
+        type: mediaItem.type,
+        file_url: mediaItem.file_url
+      });
+      
       if (mediaItem.type === 'فيديو') {
-        setVideoPlayer({ 
-          isOpen: true, 
-          src: mediaItem.file_url, 
-          title,
-          thumbnail: mediaItem.thumbnail_url 
+        // Use the video player for videos
+        setVideoPlayer({
+          isOpen: true,
+          src: mediaItem.file_url,
+          title: title
         });
       } else {
-        // For audio files, open in new tab
-        window.open(mediaItem.file_url, '_blank');
+        // For audio and other media, open in new tab
+        const mediaUrl = getBunnyVideoUrl(mediaItem.file_url);
+        debugVideoUrl(mediaUrl, title);
+        window.open(mediaUrl, '_blank');
+        
+        const mediaType = mediaItem.type === 'فيديو' ? '🎬' : '🎵';
         toast({
-          title: "🎵 تشغيل الصوت",
+          title: `${mediaType} فتح الوسائط`,
           description: `تم فتح "${title}" في نافذة جديدة`,
-          duration: 3000,
+          duration: 4000,
         });
       }
     } else {
@@ -233,7 +232,7 @@ const MediaPage = () => {
                     onClick={() => setSelectedType(type.id)}
                     className={`flex items-center space-x-2 space-x-reverse px-6 py-3 rounded-full transition-all duration-300 modern-font focus:outline-none focus:ring-2 focus:ring-[var(--heritage-gold)] focus:ring-opacity-50 ${
                       selectedType === type.id
-                        ? 'bg-[var(--heritage-gold)] text-white shadow-lg scale-105'
+                        ? 'bg-[var(--heritage-gold)] text-black shadow-lg scale-105'
                         : 'bg-white/80 text-black hover:bg-[var(--sand-medium)] hover:text-black hover:scale-102 active:bg-[var(--sand-medium)] focus:bg-[var(--sand-medium)]'
                     }`}
                   >
@@ -508,12 +507,30 @@ const MediaPage = () => {
       </div>
       
       {videoPlayer.isOpen && (
-        <VideoPlayer
-          src={videoPlayer.src}
-          title={videoPlayer.title}
-          thumbnail={videoPlayer.thumbnail}
-          onClose={handleCloseVideo}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="relative w-full max-w-4xl mx-auto bg-white rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">{videoPlayer.title}</h3>
+              <button
+                onClick={handleCloseVideo}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="aspect-video">
+              <BunnyVideoPlayer
+                videoId={videoPlayer.src}
+                title={videoPlayer.title}
+                autoplay={true}
+                controls={true}
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

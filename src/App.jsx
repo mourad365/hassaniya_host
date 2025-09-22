@@ -1,11 +1,15 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { AuthProvider } from '@/contexts/SupabaseAuthContext';
+import { initializeConfig } from '@/utils/config';
+import { generateCSP } from '@/utils/security';
 import './i18n';
 import HomePage from '@/pages/HomePage';
 import NewsPage from '@/pages/NewsPage';
@@ -20,7 +24,6 @@ import MediaPage from '@/pages/MediaPage';
 import OpinionPage from '@/pages/OpinionPage';
 import ContactPage from '@/pages/ContactPage.jsx';
 import FacebookPage from '@/pages/FacebookPage';
-import VideoPage from '@/pages/VideoPage';
 import VideosPage from '@/pages/VideosPage';
 import AuthPage from '@/pages/AuthPage';
 import ArticleDetailPage from '@/pages/ArticleDetailPage';
@@ -42,20 +45,36 @@ import AdminLayout from '@/components/admin/AdminLayout';
 function App() {
   const { t } = useTranslation();
   
+  // Initialize configuration and security settings
+  useEffect(() => {
+    try {
+      initializeConfig();
+    } catch (error) {
+      console.error('Failed to initialize configuration:', error);
+    }
+  }, []);
+  
   return (
-    <HelmetProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <div className="min-h-screen bg-sand-light">
-        <Helmet>
-          <title>{t('siteName')} - {t('siteDescription')}</title>
-          <meta name="description" content={t('siteDescription')} />
-          <meta property="og:title" content={`${t('siteName')} - ${t('siteDescription')}`} />
-          <meta property="og:description" content={t('siteDescription')} />
-          <meta property="og:type" content="website" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-        </Helmet>
+    <ErrorBoundary>
+      <AuthProvider>
+        <HelmetProvider>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <div className="min-h-screen bg-sand-light">
+          <Helmet>
+            <title>{t('siteName')} - {t('siteDescription')}</title>
+            <meta name="description" content={t('siteDescription')} />
+            <meta property="og:title" content={`${t('siteName')} - ${t('siteDescription')}`} />
+            <meta property="og:description" content={t('siteDescription')} />
+            <meta property="og:type" content="website" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta httpEquiv="Content-Security-Policy" content={generateCSP()} />
+            <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+            <meta httpEquiv="X-Frame-Options" content="DENY" />
+            <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+            <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+          </Helmet>
         
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
@@ -112,6 +131,8 @@ function App() {
         </div>
       </Router>
     </HelmetProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

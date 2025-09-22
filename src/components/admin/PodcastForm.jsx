@@ -15,6 +15,7 @@ import { Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import LocalizedFileInput from '@/components/ui/LocalizedFileInput';
 import { Upload } from 'tus-js-client';
+import { getCollectionOptions } from '@/utils/bunnyVideoCollections';
 
 const formSchema = z.object({
   // Required to satisfy DB NOT NULL constraints
@@ -27,8 +28,7 @@ const formSchema = z.object({
   duration: z.string().optional(),
   guest_name: z.string().optional(),
   season: z.string().optional(),
-  program_type: z.enum(['khutwa', 'maqal', 'ayan', 'other']).optional(),
-  custom_program_type: z.string().optional(),
+  bunny_collection_id: z.string().optional(),
 });
 
 const PodcastForm = ({ item, onSuccess, onCancel }) => {
@@ -38,8 +38,7 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
   const [audioFile, setAudioFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
-  const [uploadAsVideo, setUploadAsVideo] = useState(false);
-  const [programType, setProgramType] = useState('khutwa');
+  const [uploadAsVideo, setUploadAsVideo] = useState(true);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -51,8 +50,7 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
       host_name: item?.host_name || '',
       guest_name: item?.guest_name || '',
       season: item?.season || '1',
-      program_type: item?.program_type || 'khutwa',
-      custom_program_type: item?.custom_program_type || '',
+      bunny_collection_id: '',
     },
   });
 
@@ -66,10 +64,8 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
         host_name: item.host_name || '',
         guest_name: item.guest_name || '',
         season: item.season || '1',
-        program_type: item.program_type || 'khutwa',
-        custom_program_type: item.custom_program_type || '',
+        bunny_collection_id: '',
       });
-      setProgramType(item.program_type || 'khutwa');
     }
   }, [item, form]);
 
@@ -239,9 +235,29 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
           throw new Error(`Could not determine video GUID from upload URL: ${uploadUrl}`);
         }
 
-        const videoCdnHostname = (import.meta.env.VITE_BUNNY_VIDEO_CDN_HOSTNAME || 'vz-a9578edc-805.b-cdn.net').trim();
-        videoUrl = `https://${videoCdnHostname}/${videoId}/playlist.m3u8`;
-        console.log('Video uploaded successfully:', videoUrl);
+        // Assign collection based on explicit selection or program type fallback
+        try {
+          let collectionId = (values.bunny_collection_id || '').trim();
+          if (collectionId && collectionId !== 'auto') {
+            const patchRes = await fetch(`https://video.bunnycdn.com/library/${libraryId}/videos/${videoId}`, {
+              method: 'PATCH',
+              headers: {
+                'AccessKey': videoApiKey,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ collectionId }),
+            });
+            if (!patchRes.ok) {
+              console.warn('Failed to set collection on Bunny video', await patchRes.text().catch(() => ''));
+            }
+          }
+        } catch (e) {
+          console.warn('Collection assignment skipped/failed:', e?.message || e);
+        }
+
+        // Store the GUID; player utilities will convert GUID to proper URLs
+        videoUrl = videoId;
+        console.log('Video uploaded successfully. GUID:', videoUrl);
       } catch (error) {
         console.warn('Video upload error:', error);
         toast({ 
@@ -276,13 +292,7 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
       if (imageUrl) updateData.image_url = imageUrl;
       if (videoUrl) updateData.video_url = videoUrl;
       
-      // Add program type fields if provided
-      if (hasVal(values.program_type)) {
-        updateData.program_type = values.program_type;
-      }
-      if (hasVal(values.custom_program_type) && values.program_type === 'other') {
-        updateData.custom_program_type = values.custom_program_type;
-      }
+      // program type removed
       
       const result = await supabase
         .from('podcasts')
@@ -313,10 +323,6 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
       
       // Add new fields if provided
       if (videoUrl) baseData.video_url = videoUrl;
-      if (hasVal(values.program_type)) baseData.program_type = values.program_type;
-      if (hasVal(values.custom_program_type) && values.program_type === 'other') {
-        baseData.custom_program_type = values.custom_program_type;
-      }
       
       let result = await supabase.from('podcasts').insert(baseData);
       
@@ -362,8 +368,7 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
         setAudioFile(null);
         setImageFile(null);
         setVideoFile(null);
-        setUploadAsVideo(false);
-        setProgramType('khutwa');
+        setUploadAsVideo(true);
       }
       if (onSuccess) onSuccess();
     }
@@ -478,40 +483,25 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="program_type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="arabic-font">نوع البرنامج</FormLabel>
-                  <Select onValueChange={(value) => { field.onChange(value); setProgramType(value); }} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="arabic-body">
-                        <SelectValue placeholder="اختر نوع البرنامج" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="khutwa">برنامج خطوة</SelectItem>
-                      <SelectItem value="maqal">برنامج المقال</SelectItem>
-                      <SelectItem value="ayan">برنامج أعيان</SelectItem>
-                      <SelectItem value="other">أخرى</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Program type field removed as requested */}
             
-            {programType === 'other' && (
+            {uploadAsVideo && (
               <FormField
                 control={form.control}
-                name="custom_program_type"
+                name="bunny_collection_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="arabic-font">نوع البرنامج المخصص</FormLabel>
-                    <FormControl>
-                      <Input placeholder="أدخل نوع البرنامج" {...field} className="arabic-body" />
-                    </FormControl>
+                    <FormLabel className="arabic-font">المجموعة  (اختياري)</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl><SelectTrigger className="arabic-body"><SelectValue placeholder="اختر مجموعة (اختياري)" /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        {getCollectionOptions().map(option => (
+                          <SelectItem key={option.id} value={option.id} className="arabic-body">
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -526,13 +516,13 @@ const PodcastForm = ({ item, onSuccess, onCancel }) => {
                   onCheckedChange={setUploadAsVideo}
                 />
                 <FormLabel htmlFor="upload-as-video" className="arabic-font">
-                  رفع كفيديو أيضًا
+                  رفع كفيديو
                 </FormLabel>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormItem>
-                  <FormLabel className="arabic-font">الملف الصوتي</FormLabel>
+                  <FormLabel className="arabic-font">الملف الصوتي (اختياري)</FormLabel>
                   <FormControl>
                     <LocalizedFileInput accept="audio/*" onChange={(files) => setAudioFile(files && files[0])} />
                   </FormControl>

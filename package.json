@@ -6,7 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "node tools/generate-llms.js || true && vite build",
-    "preview": "vite preview"
+    "build:prod": "NODE_ENV=production npm run build",
+    "preview": "vite preview",
+    "preview:prod": "npm run build:prod && vite preview",
+    "lint": "eslint src --ext .js,.jsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix",
+    "type-check": "tsc --noEmit",
+    "audit:security": "npm audit --audit-level moderate",
+    "clean": "rm -rf dist node_modules/.vite",
+    "analyze": "npm run build && npx vite-bundle-analyzer",
+    "vercel:dev": "vercel dev",
+    "vercel:deploy": "vercel",
+    "vercel:deploy:prod": "vercel --prod",
+    "vercel:env": "vercel env pull .env.local",
+    "deploy:hassaniya": "npm run audit:security && npm run build:prod && vercel --prod"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.1",
@@ -30,6 +43,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.4",
+    "hls.js": "^1.6.12",
     "i18next": "^25.4.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.285.0",
@@ -41,8 +55,8 @@
     "react-router-dom": "^6.16.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.22.4",
-    "tus-js-client": "^3.1.0"
+    "tus-js-client": "^3.1.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/generator": "^7.27.0",

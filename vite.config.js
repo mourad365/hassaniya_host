@@ -187,8 +187,8 @@ export default defineConfig({
 	customLogger: logger,
 	plugins: [
 		react(),
-		addTransformIndexHtml
-	],
+		isDev ? addTransformIndexHtml : null
+	].filter(Boolean),
 	server: {
 		cors: true,
 		headers: {
@@ -203,13 +203,67 @@ export default defineConfig({
 		},
 	},
 	build: {
+		// Production optimizations
+		target: 'esnext',
+		minify: 'terser',
+		sourcemap: false, // Disable sourcemaps in production for security
 		rollupOptions: {
 			external: [
 				'@babel/parser',
 				'@babel/traverse',
 				'@babel/generator',
 				'@babel/types'
-			]
+			],
+			output: {
+				// Optimize chunk splitting
+				manualChunks: {
+					vendor: ['react', 'react-dom'],
+					ui: ['@radix-ui/react-dialog', '@radix-ui/react-select', 'lucide-react'],
+					supabase: ['@supabase/supabase-js'],
+					forms: ['react-hook-form', '@hookform/resolvers', 'zod'],
+					video: ['hls.js']
+				},
+				// Security: Remove comments and console logs in production
+				banner: '/* Hassaniya Host - Production Build */',
+				compact: true
+			}
+		},
+		// Terser options for better security and compression
+		terserOptions: {
+			compress: {
+				drop_console: true, // Remove console.log in production
+				drop_debugger: true,
+				pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn']
+			},
+			mangle: {
+				safari10: true
+			},
+			format: {
+				comments: false // Remove comments
+			}
+		},
+		// Asset optimization
+		assetsDir: 'assets',
+		chunkSizeWarningLimit: 1000,
+		cssCodeSplit: true
+	},
+	// Environment variables handling
+	define: {
+		// Ensure we don't accidentally expose sensitive env vars
+		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+		// Add app version for production tracking
+		'__APP_VERSION__': JSON.stringify(process.env.npm_package_version || '1.0.0')
+	},
+	// Preview server configuration (for production preview)
+	preview: {
+		port: 4173,
+		host: true,
+		headers: {
+			'X-Content-Type-Options': 'nosniff',
+			'X-Frame-Options': 'DENY',
+			'X-XSS-Protection': '1; mode=block',
+			'Referrer-Policy': 'strict-origin-when-cross-origin',
+			'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
 		}
 	}
 });

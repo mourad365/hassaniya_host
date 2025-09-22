@@ -8,6 +8,7 @@ import Literature from '@/components/home/Literature';
 import CallToAction from '@/components/home/CallToAction';
 import Programs from '@/components/home/Programs';
 import ContributeHeritage from '@/components/home/ContributeHeritage';
+import SocialMediaSection from '@/components/home/SocialMediaSection';
 
 const HomePage = () => {
   return (
@@ -24,6 +25,7 @@ const HomePage = () => {
         <FeaturedNews />
         <Programs />
         <LatestNewsAndCulture />
+        <SocialMediaSection />
         <Literature />
         <ContributeHeritage />
         <CallToAction />
@@ -33,3 +35,4 @@ const HomePage = () => {
 };
 
 export default HomePage;
+

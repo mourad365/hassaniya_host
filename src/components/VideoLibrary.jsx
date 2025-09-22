@@ -3,8 +3,9 @@ import { Search, Filter, Calendar, Eye, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BunnyVideoPlayer from './BunnyVideoPlayer';
 import { useLanguage } from '@/hooks/use-language';
+import { getCollectionIdByKey } from '@/utils/bunnyVideoCollections';
 
-const VideoLibrary = () => {
+const VideoLibrary = ({ collectionKey = '', collectionId: explicitCollectionId = '' }) => {
   const { t, isRTL } = useLanguage();
   const [videos, setVideos] = useState([]);
   const [filteredVideos, setFilteredVideos] = useState([]);
@@ -17,21 +18,21 @@ const VideoLibrary = () => {
   const libraryId = import.meta.env.VITE_BUNNY_VIDEO_LIBRARY_ID || '493708';
   const apiKey = import.meta.env.VITE_BUNNY_VIDEO_API_KEY || '4e19874d-4ee6-4f16-a29864485e6d-7a39-481e';
   const cdnHostname = import.meta.env.VITE_BUNNY_VIDEO_CDN_HOSTNAME || 'vz-a9578edc-805.b-cdn.net';
+  const resolvedCollectionId = explicitCollectionId || (collectionKey ? getCollectionIdByKey(collectionKey) : '');
 
   // Fetch videos from Bunny Stream API
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `https://video.bunnycdn.com/library/${libraryId}/videos`,
-          {
-            headers: {
-              'AccessKey': apiKey,
-              'Content-Type': 'application/json'
-            }
+        const baseUrl = `https://video.bunnycdn.com/library/${libraryId}/videos`;
+        const url = resolvedCollectionId ? `${baseUrl}?collection=${encodeURIComponent(resolvedCollectionId)}` : baseUrl;
+        const response = await fetch(url, {
+          headers: {
+            'AccessKey': apiKey,
+            'Content-Type': 'application/json'
           }
-        );
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch videos');
@@ -71,7 +72,7 @@ const VideoLibrary = () => {
     };
 
     fetchVideos();
-  }, [libraryId, apiKey]);
+  }, [libraryId, apiKey, resolvedCollectionId]);
 
   // Filter and search videos
   useEffect(() => {

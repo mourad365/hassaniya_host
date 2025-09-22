@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, User, Eye, Share2, Clock } from 'lucide-react';
+import { Calendar, User, Eye, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -23,6 +23,7 @@ const FeaturedNews = () => {
             author_name,
             publish_date,
             image_url,
+            view_count,
             categories (name)
           `)
           .eq('is_featured', true)
@@ -41,8 +42,7 @@ const FeaturedNews = () => {
           category: article.categories?.name || 'عام',
           author: article.author_name,
           date: article.publish_date,
-          views: Math.floor(Math.random() * 1000) + 500, // Random views for now
-          readTime: `${Math.floor(Math.random() * 5) + 3} دقائق`,
+          views: typeof article.view_count === 'number' ? article.view_count : undefined,
           image_url: article.image_url
         })) || [];
 
@@ -70,6 +70,8 @@ const FeaturedNews = () => {
       duration: 3000,
     });
   };
+
+  if (!featuredNews || featuredNews.length === 0) return null;
 
   return (
     <section className="py-16 bg-sand-light">
@@ -130,28 +132,26 @@ const FeaturedNews = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-3 border-t border-[var(--sand-dark)]">
-                  <div className="flex items-center space-x-4 space-x-reverse text-sm text-[var(--desert-brown)]">
-                    <div className="flex items-center space-x-1 space-x-reverse">
-                      <Eye size={14} />
-                      <span className="modern-font">{article.views}</span>
+                {typeof article.views === 'number' && (
+                  <div className="flex items-center justify-between pt-3 border-t border-[var(--sand-dark)]">
+                    <div className="flex items-center space-x-4 space-x-reverse text-sm text-[var(--desert-brown)]">
+                      <div className="flex items-center space-x-1 space-x-reverse">
+                        <Eye size={14} />
+                        <span className="modern-font">{article.views}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1 space-x-reverse">
-                      <Clock size={14} />
-                      <span className="modern-font">{article.readTime}</span>
-                    </div>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShare(article.title);
+                      }}
+                      className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
+                    >
+                      <Share2 size={16} />
+                    </button>
                   </div>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShare(article.title);
-                    }}
-                    className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                  >
-                    <Share2 size={16} />
-                  </button>
-                </div>
+                )}
               </div>
             </motion.article>
           ))}

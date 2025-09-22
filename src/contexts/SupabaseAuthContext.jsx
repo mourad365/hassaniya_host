@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
-
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
+import { sanitizeString, validateEmail } from '@/utils/security';
+import { SECURITY_CONFIG } from '@/utils/config';
 
-const AuthContext = createContext(undefined);
+export const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const { toast } = useToast();
@@ -72,26 +73,55 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = useCallback(async (email, password, options) => {
     try {
+      // Input validation and sanitization
+      const sanitizedEmail = sanitizeString(email).toLowerCase();
+      
+      if (!validateEmail(sanitizedEmail)) {
+        const errorMsg = "البريد الإلكتروني غير صحيح";
+        toast({
+          variant: "destructive",
+          title: "خطأ في التسجيل",
+          description: errorMsg,
+        });
+        return { error: { message: errorMsg } };
+      }
+
+      if (!password || password.length < 8) {
+        const errorMsg = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+        toast({
+          variant: "destructive",
+          title: "خطأ في التسجيل",
+          description: errorMsg,
+        });
+        return { error: { message: errorMsg } };
+      }
+
       const { error } = await supabase.auth.signUp({
-        email,
+        email: sanitizedEmail,
         password,
         options,
       });
 
       if (error) {
+        const arabicMessage = error.message.includes('already registered') 
+          ? 'هذا البريد الإلكتروني مسجل مسبقاً'
+          : error.message.includes('invalid email')
+          ? 'البريد الإلكتروني غير صحيح'
+          : 'فشل في التسجيل';
+          
         toast({
           variant: "destructive",
-          title: "Sign up Failed",
-          description: error.message || "Authentication service temporarily unavailable",
+          title: "فشل في التسجيل",
+          description: arabicMessage,
         });
       }
 
       return { error };
     } catch (err) {
-      const errorMsg = "Authentication service temporarily unavailable. Please try again later.";
+      const errorMsg = "خدمة المصادقة غير متاحة مؤقتاً. يرجى المحاولة لاحقاً.";
       toast({
         variant: "destructive",
-        title: "Connection Error",
+        title: "خطأ في الاتصال",
         description: errorMsg,
       });
       return { error: { message: errorMsg } };
@@ -100,25 +130,56 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = useCallback(async (email, password) => {
     try {
+      // Input validation and sanitization
+      const sanitizedEmail = sanitizeString(email).toLowerCase();
+      
+      if (!validateEmail(sanitizedEmail)) {
+        const errorMsg = "البريد الإلكتروني غير صحيح";
+        toast({
+          variant: "destructive",
+          title: "فشل في تسجيل الدخول",
+          description: errorMsg,
+        });
+        return { error: { message: errorMsg } };
+      }
+
+      if (!password || password.length < 6) {
+        const errorMsg = "كلمة المرور مطلوبة";
+        toast({
+          variant: "destructive",
+          title: "فشل في تسجيل الدخول",
+          description: errorMsg,
+        });
+        return { error: { message: errorMsg } };
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: sanitizedEmail,
         password,
       });
 
       if (error) {
+        const arabicMessage = error.message.includes('Invalid login credentials') 
+          ? 'بيانات تسجيل الدخول غير صحيحة'
+          : error.message.includes('Email not confirmed')
+          ? 'يرجى تأكيد البريد الإلكتروني'
+          : error.message.includes('Too many requests')
+          ? 'محاولات كثيرة جداً. يرجى المحاولة لاحقاً'
+          : 'فشل في تسجيل الدخول';
+          
         toast({
           variant: "destructive",
-          title: "Sign in Failed",
-          description: error.message || "Authentication service temporarily unavailable",
+          title: "فشل في تسجيل الدخول",
+          description: arabicMessage,
         });
       }
 
       return { error };
     } catch (err) {
-      const errorMsg = "Authentication service temporarily unavailable. Please try again later.";
+      const errorMsg = "خدمة المصادقة غير متاحة مؤقتاً. يرجى المحاولة لاحقاً.";
       toast({
         variant: "destructive",
-        title: "Connection Error",
+        title: "خطأ في الاتصال",
         description: errorMsg,
       });
       return { error: { message: errorMsg } };

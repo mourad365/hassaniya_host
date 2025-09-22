@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, User, Eye, ArrowRight, Tag, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Calendar, User, Eye, Tag } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useLanguage } from '@/hooks/use-language';
@@ -24,6 +22,7 @@ const LatestNewsAndCulture = () => {
                         author_name,
                         publish_date,
                         image_url,
+                        view_count,
                         categories (name)
                     `)
                     .eq('is_featured', false)
@@ -41,7 +40,7 @@ const LatestNewsAndCulture = () => {
                     excerpt: article.excerpt,
                     category: article.categories?.name || 'عام',
                     date: article.publish_date,
-                    views: Math.floor(Math.random() * 1000) + 100,
+                    views: typeof article.view_count === 'number' ? article.view_count : undefined,
                     image_url: article.image_url
                 })) || [];
 
@@ -62,6 +61,7 @@ const LatestNewsAndCulture = () => {
                         author_name,
                         publish_date,
                         image_url,
+                        view_count,
                         categories (name)
                     `)
                     .eq('categories.name', 'ثقافة وتراث')
@@ -79,7 +79,8 @@ const LatestNewsAndCulture = () => {
                     excerpt: article.excerpt,
                     author: article.author_name,
                     date: article.publish_date,
-                    image_url: article.image_url
+                    image_url: article.image_url,
+                    views: typeof article.view_count === 'number' ? article.view_count : undefined
                 })) || [];
 
                 setCultureArticles(formattedCulture);
@@ -110,14 +111,7 @@ const LatestNewsAndCulture = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold arabic-title text-[var(--tent-black)]">
-                    آخر الأخبار
-                  </h2>
-                  <Link to="/news" className="text-[var(--heritage-gold)] hover:text-[var(--desert-brown)] transition-colors modern-font flex items-center">
-                    عرض الكل <ArrowLeft className="inline mr-2" size={16} />
-                  </Link>
-                </div>
+                {/* Removed "آخر الأخبار" header and "عرض الكل" link */}
                 
                 <div className="space-y-6">
                   {latestNews.map((article) => (
@@ -143,10 +137,12 @@ const LatestNewsAndCulture = () => {
                             <Calendar size={12} />
                             <span className="modern-font">{article.date}</span>
                           </div>
-                          <div className="flex items-center space-x-1 space-x-reverse">
-                            <Eye size={12} />
-                            <span className="modern-font">{article.views}</span>
-                          </div>
+                          {typeof article.views === 'number' && (
+                            <div className="flex items-center space-x-1 space-x-reverse">
+                              <Eye size={12} />
+                              <span className="modern-font">{article.views}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </motion.article>
@@ -160,14 +156,7 @@ const LatestNewsAndCulture = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold arabic-title text-[var(--tent-black)]">
-                    ثقافة وتراث
-                  </h2>
-                  <Link to="/culture" className="text-[var(--heritage-gold)] hover:text-[var(--desert-brown)] transition-colors modern-font flex items-center">
-                    عرض الكل <ArrowLeft className="inline mr-2" size={16} />
-                  </Link>
-                </div>
+                {/* Removed "ثقافة وتراث" header and "عرض الكل" link */}
                 
                 <div className="space-y-6">
                   {cultureArticles.map((article) => (
