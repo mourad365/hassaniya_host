@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Calendar, User, Eye, Share2, MapPin, Clock, Star, Award, Play, X } from 'lucide-react';
+import { Calendar, User, Eye, MapPin, Clock, Star, Award, Play, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
@@ -76,13 +76,7 @@ const EmiratesPage = () => {
 
   const featuredArticles = articles.filter(article => article.featured);
 
-  const handleShare = (title) => {
-    toast({
-      title: t('shareArticle'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
-  };
+  // Sharing disabled
 
   const handleReadMore = (id, title) => {
     toast({
@@ -167,150 +161,6 @@ const EmiratesPage = () => {
               })}
             </div>
           </motion.div>
-
-          {/* Featured Articles */}
-          {selectedEmirate === 'الكل' && featuredArticles.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mb-16"
-            >
-              <h2 className="text-3xl font-bold arabic-title text-[var(--tent-black)] mb-8 text-center">
-                المقالات المميزة
-              </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {featuredArticles.map((article, index) => (
-                  <motion.article
-                    key={article.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                    className="heritage-card hover-lift group cursor-pointer relative overflow-hidden"
-                    onClick={() => handleReadMore(article.id, article.title)}
-                  >
-                    <div className="absolute top-4 right-4 z-10">
-                      <span className="bg-[var(--heritage-gold)] text-white px-3 py-1 rounded-full text-sm modern-font">
-                        مميز
-                      </span>
-                    </div>
-                    
-                    <div className="relative mb-6 overflow-hidden rounded-lg">
-                      {playingVideos[article.id] && hasVideo(article) ? (
-                        <div className="relative">
-                          <video
-                            className="w-full h-64 object-cover"
-                            controls
-                            autoPlay
-                            onEnded={() => toggleVideo(article.id)}
-                            poster={getThumbnailUrl(article)}
-                          >
-                            <source src={getVideoUrl(article)} type="video/mp4" />
-                            <source src={getVideoUrl(article)} type="video/webm" />
-                            <p className="text-white arabic-body p-4">
-                              متصفحك لا يدعم تشغيل الفيديو.
-                            </p>
-                          </video>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleVideo(article.id);
-                            }}
-                            className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 transition-colors"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="relative">
-                          <img  
-                            className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                            alt={`صورة ${article.title}`}
-                            src={getThumbnailUrl(article)} />
-                          {hasVideo(article) && (
-                            <>
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleVideo(article.id);
-                                  }}
-                                  className="bg-white/90 text-[var(--tent-black)] rounded-full p-4 hover:bg-white transition-colors"
-                                >
-                                  <Play size={32} />
-                                </button>
-                              </div>
-                              <div className="absolute top-4 left-4">
-                                <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm modern-font flex items-center space-x-1 space-x-reverse">
-                                  <Play size={14} />
-                                  <span>فيديو</span>
-                                </span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="absolute bottom-4 right-4">
-                        <span className="bg-[var(--oasis-blue)] text-white px-3 py-1 rounded-full text-sm modern-font">
-                          {article.emirate}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="bg-[var(--sand-medium)] text-[var(--tent-black)] px-3 py-1 rounded-full text-sm modern-font">
-                          {article.category}
-                        </span>
-                        <div className="flex items-center space-x-1 space-x-reverse">
-                          <Star className="text-yellow-500 fill-current" size={16} />
-                          <span className="text-sm modern-font text-[var(--desert-brown)]">{article.rating}</span>
-                        </div>
-                      </div>
-                      
-                      <h3 className="text-2xl font-bold arabic-title text-[var(--tent-black)] group-hover:text-[var(--heritage-gold)] transition-colors">
-                        {article.title}
-                      </h3>
-                      
-                      <p className="text-[var(--deep-brown)] arabic-body leading-relaxed">
-                        {article.excerpt}
-                      </p>
-                      
-                      <div className="flex items-center justify-between pt-4 border-t border-[var(--sand-dark)]">
-                        <div className="flex items-center space-x-4 space-x-reverse text-sm text-[var(--desert-brown)]">
-                          <div className="flex items-center space-x-1 space-x-reverse">
-                            <User size={14} />
-                            <span className="modern-font">{article.author}</span>
-                          </div>
-                          <div className="flex items-center space-x-1 space-x-reverse">
-                            <Calendar size={14} />
-                            <span className="modern-font">{article.date}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-3 space-x-reverse">
-                          <div className="flex items-center space-x-1 space-x-reverse text-sm text-[var(--desert-brown)]">
-                            <Eye size={14} />
-                            <span className="modern-font">{article.views}</span>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleShare(article.title);
-                            }}
-                            className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                          >
-                            <Share2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.article>
-                ))}
-              </div>
-            </motion.section>
-          )}
 
           {/* All Articles */}
           <motion.section
@@ -442,16 +292,7 @@ const EmiratesPage = () => {
                           <span className="modern-font">{article.readTime}</span>
                         </div>
                       </div>
-                      
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleShare(article.title);
-                        }}
-                        className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                      >
-                        <Share2 size={16} />
-                      </button>
+                      {/* Share button removed */}
                     </div>
                   </div>
                 </motion.article>

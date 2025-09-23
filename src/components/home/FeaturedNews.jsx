@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, User, Eye, Share2 } from 'lucide-react';
+import { Calendar, User, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -53,14 +53,6 @@ const FeaturedNews = () => {
 
     fetchFeaturedNews();
   }, []);
-
-  const handleShare = (title) => {
-    toast({
-      title: `📤 ${title}`,
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
-  };
 
   const handleReadMore = (id, title) => {
     toast({
@@ -139,16 +131,6 @@ const FeaturedNews = () => {
                         <span className="modern-font">{article.views}</span>
                       </div>
                     </div>
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleShare(article.title);
-                      }}
-                      className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                    >
-                      <Share2 size={16} />
-                    </button>
                   </div>
                 )}
               </div>

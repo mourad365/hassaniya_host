@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Play, Download, Eye, Share2, Calendar, User, Volume2, Image, Video, FileText } from 'lucide-react';
+import { Play, Eye, Calendar, User, Volume2, Image, Video, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -157,37 +157,7 @@ const MediaPage = () => {
     setVideoPlayer({ isOpen: false, src: '', title: '' });
   };
 
-  const handleDownload = (id, title) => {
-    const mediaItem = media.find(item => item.id === id);
-    if (mediaItem && mediaItem.file_url) {
-      const link = document.createElement('a');
-      link.href = mediaItem.file_url;
-      link.download = title;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast({
-        title: "⬇️ تحميل الملف",
-        description: `بدء تحميل "${title}"`,
-        duration: 3000,
-      });
-    } else {
-      toast({
-        title: "⚠️ خطأ",
-        description: `لا يوجد ملف متاح للتحميل لـ "${title}"`,
-        duration: 3000,
-      });
-    }
-  };
-
-  const handleShare = (title) => {
-    toast({
-      title: `📤 ${title}`,
-      description: "هذه الميزة غير متوفرة حالياً",
-      duration: 3000,
-    });
-  };
+  // Download and sharing features are disabled
 
   return (
     <>
@@ -346,26 +316,9 @@ const MediaPage = () => {
                             <Eye size={14} />
                             <span className="modern-font">{item.views}</span>
                           </div>
-                          <div className="flex items-center space-x-1 space-x-reverse">
-                            <Download size={14} />
-                            <span className="modern-font">{item.downloads}</span>
-                          </div>
+                          <span className="modern-font">{item.size}</span>
                         </div>
-                        
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                          <button
-                            onClick={() => handleDownload(item.id, item.title)}
-                            className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                          >
-                            <Download size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleShare(item.title)}
-                            className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                          >
-                            <Share2 size={16} />
-                          </button>
-                        </div>
+                        {/* Download and share actions removed */}
                       </div>
                     </div>
                   </motion.article>
@@ -477,21 +430,7 @@ const MediaPage = () => {
                         </div>
                         <span className="modern-font">{item.size}</span>
                       </div>
-                      
-                      <div className="flex items-center space-x-2 space-x-reverse">
-                        <button
-                          onClick={() => handleDownload(item.id, item.title)}
-                          className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                        >
-                          <Download size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleShare(item.title)}
-                          className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                        >
-                          <Share2 size={16} />
-                        </button>
-                      </div>
+                      {/* Download and share actions removed */}
                     </div>
                   </div>
                 </motion.article>

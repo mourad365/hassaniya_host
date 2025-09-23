@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Calendar, User, Eye, Share2, Globe, MapPin, Clock, TrendingUp, Play, Video, FileText } from 'lucide-react';
+import { Calendar, User, Eye, Globe, MapPin, Clock, TrendingUp, Play, Video, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import ContributeHeritage from '@/components/home/ContributeHeritage';
@@ -114,14 +114,7 @@ const PoliticsPage = () => {
 
   const trendingArticles = articles.filter(article => article.trending);
   const trendingVideos = videos.filter(video => video.trending);
-
-  const handleShare = (title) => {
-    toast({
-      title: t('shareArticle'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
-  };
+  // Sharing disabled
 
   const handleReadMore = (id, title) => {
     toast({
@@ -311,15 +304,7 @@ const PoliticsPage = () => {
                                 <Eye size={16} className="text-heritage-gold" />
                                 <span className="modern-font font-medium">{featuredItem.views || 0}</span>
                               </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleShare(featuredItem.title);
-                                }}
-                                className="text-heritage-brown hover:text-heritage-gold transition-colors p-2 rounded-lg hover:bg-sand-200"
-                              >
-                                <Share2 size={18} />
-                              </button>
+                              {/* Share button removed */}
                             </div>
                           </div>
                         </div>
@@ -410,15 +395,7 @@ const PoliticsPage = () => {
                                   <Eye size={14} className="text-heritage-gold" />
                                   <span className="modern-font font-medium">{item.views || 0}</span>
                                 </div>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleShare(item.title);
-                                  }}
-                                  className="text-heritage-brown hover:text-heritage-gold transition-colors p-2 rounded-lg hover:bg-sand-200"
-                                >
-                                  <Share2 size={16} />
-                                </button>
+                                {/* Share button removed */}
                               </div>
                             </div>
                           </div>

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
-import { Heart, Users, BookOpen, Share2 } from 'lucide-react';
+import { Heart, Users, BookOpen } from 'lucide-react';
 
 const ContributeHeritage = () => {
   const { t } = useLanguage();
@@ -21,9 +21,9 @@ const ContributeHeritage = () => {
       description: 'كن جزءاً من مجتمع المهتمين بالتراث الحساني'
     },
     {
-      icon: Share2,
-      title: 'انشر المحتوى',
-      description: 'ساعد في نشر الثقافة الحسانية للعالم'
+      icon: BookOpen,
+      title: 'تعلم وشارك',
+      description: 'ساهم في التعلم ومشاركة الثقافة الحسانية'
     }
   ];
 

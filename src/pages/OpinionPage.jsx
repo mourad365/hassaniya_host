@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Calendar, User, Eye, Share2, MessageCircle, ThumbsUp, Edit3, Send } from 'lucide-react';
+import { Calendar, User, Eye, MessageCircle, ThumbsUp, Edit3, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/hooks/use-language';
 import { useNavigate } from 'react-router-dom';
-import { shareService, newsletterService } from '@/services/interactionService';
+import { newsletterService } from '@/services/interactionService';
 
 const OpinionPage = () => {
   const { t, language, isRTL } = useLanguage();
@@ -48,13 +48,7 @@ const OpinionPage = () => {
 
   const featuredArticles = articles.filter(article => article.featured);
 
-  const handleShare = async (id, title) => {
-    try {
-      await shareService.shareToSocial('article', id, title, 'facebook');
-    } catch (e) {
-      console.warn('Share failed', e);
-    }
-  };
+  // Sharing disabled
 
   const handleReadMore = (slugOrId) => {
     if (slugOrId) {
@@ -254,15 +248,7 @@ const OpinionPage = () => {
                                 <MessageCircle size={14} />
                                 <span className="modern-font">{article.comments}</span>
                               </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleShare(article.title);
-                                }}
-                                className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                              >
-                                <Share2 size={16} />
-                              </button>
+                              {/* Share button removed */}
                             </div>
                           </div>
                         </div>
@@ -365,15 +351,7 @@ const OpinionPage = () => {
                               <MessageCircle size={14} />
                               <span className="modern-font">{article.comments}</span>
                             </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleShare(article.title);
-                              }}
-                              className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                            >
-                              <Share2 size={16} />
-                            </button>
+                            {/* Share button removed */}
                           </div>
                         </div>
                       </div>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Calendar, User, Eye, Share2, BookOpen, Music, Palette, Camera } from 'lucide-react';
+import { Calendar, User, Eye, BookOpen, Music, Palette, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useQuery } from '@tanstack/react-query';
@@ -68,13 +68,7 @@ const CulturePage = () => {
 
   const featuredArticles = articles.filter(article => article.featured);
 
-  const handleShare = (title) => {
-    toast({
-      title: t('shareArticle'),
-      description: t('featureNotImplemented'),
-      duration: 3000,
-    });
-  };
+  // Sharing disabled
 
   const handleReadMore = (id, title) => {
     toast({
@@ -208,15 +202,7 @@ const CulturePage = () => {
                             <Eye size={14} />
                             <span className="modern-font">{article.views}</span>
                           </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleShare(article.title);
-                            }}
-                            className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                          >
-                            <Share2 size={16} />
-                          </button>
+                          {/* Share button removed */}
                         </div>
                       </div>
                     </div>
@@ -295,16 +281,7 @@ const CulturePage = () => {
                         </div>
                         <span className="modern-font">{article.readTime}</span>
                       </div>
-                      
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleShare(article.title);
-                        }}
-                        className="text-[var(--desert-brown)] hover:text-[var(--heritage-gold)] transition-colors"
-                      >
-                        <Share2 size={16} />
-                      </button>
+                      {/* Share button removed */}
                     </div>
                   </div>
                 </motion.article>
