@@ -22,7 +22,6 @@ const LatestNewsAndCulture = () => {
                         author_name,
                         publish_date,
                         image_url,
-                        view_count,
                         categories (name)
                     `)
                     .eq('is_featured', false)
@@ -61,7 +60,6 @@ const LatestNewsAndCulture = () => {
                         author_name,
                         publish_date,
                         image_url,
-                        view_count,
                         categories (name)
                     `)
                     .eq('categories.name', 'ثقافة وتراث')

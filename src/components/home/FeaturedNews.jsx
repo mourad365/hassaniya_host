@@ -23,7 +23,6 @@ const FeaturedNews = () => {
             author_name,
             publish_date,
             image_url,
-            view_count,
             categories (name)
           `)
           .eq('is_featured', true)

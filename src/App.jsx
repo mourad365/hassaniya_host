@@ -9,7 +9,6 @@ import Footer from '@/components/Footer';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { AuthProvider } from '@/contexts/SupabaseAuthContext';
 import { initializeConfig } from '@/utils/config';
-import { generateCSP } from '@/utils/security';
 import './i18n';
 import HomePage from '@/pages/HomePage';
 import NewsPage from '@/pages/NewsPage';
@@ -67,11 +66,6 @@ function App() {
             <meta property="og:description" content={t('siteDescription')} />
             <meta property="og:type" content="website" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <meta httpEquiv="Content-Security-Policy" content={generateCSP()} />
-            <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-            <meta httpEquiv="X-Frame-Options" content="DENY" />
-            <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
-            <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
           </Helmet>

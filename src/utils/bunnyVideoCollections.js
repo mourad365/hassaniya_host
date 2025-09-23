@@ -58,21 +58,16 @@ export function getDefaultAccessMode() {
 }
 
 export function getVideoToken() {
-  // If no token is set but we have an API key, try using that
+  // Playback tokens must be created explicitly for token-based access.
+  // Never use the API key as a playback token.
   const token = (import.meta.env.VITE_BUNNY_VIDEO_TOKEN || '').trim();
-  if (!token) {
-    // Fallback to API key if no specific token is set
-    const apiKey = (import.meta.env.VITE_BUNNY_VIDEO_API_KEY || '').trim();
-    return apiKey;
-  }
   return token;
 }
 
 export function shouldUseAuthentication() {
-  // Always try authentication if we have any form of credentials
+  // Only use authentication when default mode is token and a playback token is provided
   const token = (import.meta.env.VITE_BUNNY_VIDEO_TOKEN || '').trim();
-  const apiKey = (import.meta.env.VITE_BUNNY_VIDEO_API_KEY || '').trim();
-  return !!(token || apiKey);
+  return getDefaultAccessMode() === 'token' && !!token;
 }
 
 // Podcast program type -> Bunny collection mapping helper
