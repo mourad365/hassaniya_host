@@ -64,13 +64,5 @@
   "env": {
     "NODE_ENV": "production",
     "VITE_APP_ENV": "production"
-  },
-  "functions": {
-    "app/api/feedback.js": {
-      "runtime": "@vercel/node@2"
-    }
-  },
-  "github": {
-    "silent": true
   }
 }
