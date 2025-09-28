@@ -9,6 +9,9 @@ export async function testFacebookToken() {
   console.log('📍 PAGE_ID:', PAGE_ID);
   console.log('🔑 ACCESS_TOKEN exists:', !!ACCESS_TOKEN);
   console.log('🔑 ACCESS_TOKEN length:', ACCESS_TOKEN?.length || 0);
+  console.log('🏷️ ACCESS_TOKEN prefix:', ACCESS_TOKEN?.substring(0, 20) + '...');
+  console.log('🌐 Environment:', import.meta.env.MODE);
+  console.log('🔗 Base URL:', window.location.origin);
   
   if (!PAGE_ID || !ACCESS_TOKEN) {
     console.error('❌ Missing required environment variables');
@@ -22,12 +25,16 @@ export async function testFacebookToken() {
     };
   }
 
-  // Test 1: Check token validity
+  // Test 1: Check token validity with multiple methods
   try {
     console.log('🧪 Test 1: Checking access token validity...');
+    
+    // Method 1: Query parameter
     const tokenUrl = `https://graph.facebook.com/me?access_token=${ACCESS_TOKEN}`;
     const tokenResponse = await fetch(tokenUrl);
     const tokenData = await tokenResponse.json();
+    
+    console.log('📊 Token validation response:', tokenData);
     
     if (!tokenResponse.ok) {
       console.error('❌ Token validation failed:', tokenData);

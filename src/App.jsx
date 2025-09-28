@@ -41,6 +41,7 @@ import ContactsPage from '@/pages/admin/ContactsPage';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 import FacebookDebugger from '@/components/debug/FacebookDebugger';
+import FacebookDebugPage from '@/pages/FacebookDebugPage';
 
 function App() {
   const { t } = useTranslation();

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '@/hooks/use-language';
+import { getPagePosts } from '../services/facebookService';
 
 const FacebookFeed = ({ 
   pageUrl = "https://www.facebook.com/101470072189930",
@@ -18,10 +19,7 @@ const FacebookFeed = ({
   const observerRef = useRef(null);
   const { t, isRTL } = useLanguage();
 
-  // Facebook Page Access Token from environment variables
-  const PAGE_ACCESS_TOKEN = import.meta.env.VITE_FACEBOOK_PAGE_ACCESS_TOKEN;
-
-  const fetchFacebookPosts = useCallback(async (isLoadMore = false, afterToken = null) => {
+  const fetchFacebookPosts = useCallback(async (isLoadMore = false, nextUrl = null) => {
     try {
       if (isLoadMore) {
         setLoadingMore(true);
@@ -29,26 +27,19 @@ const FacebookFeed = ({
         setLoading(true);
       }
       
-      // Build URL with pagination support
-      let url = `https://graph.facebook.com/v19.0/${pageId}/posts?fields=id,message,created_time,full_picture,permalink_url&access_token=${PAGE_ACCESS_TOKEN}&limit=${maxPosts}`;
-      
-      if (afterToken) {
-        url += `&after=${afterToken}`;
-      }
-      
-      console.log('Fetching Facebook posts:', { isLoadMore, afterToken, url: url.replace(PAGE_ACCESS_TOKEN, 'TOKEN_HIDDEN') });
+      console.log('Fetching Facebook posts:', { isLoadMore, nextUrl: nextUrl ? 'provided' : null });
         
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to fetch Facebook posts');
-      }
-
-      const data = await response.json();
+      const data = await getPagePosts({ 
+        nextUrl: nextUrl, 
+        limit: maxPosts 
+      });
+      
       const newPosts = data.data || [];
       
-      console.log('Fetched Facebook posts:', { count: newPosts.length, hasNextPage: !!data.paging?.next });
+      console.log('Fetched Facebook posts:', { 
+        count: newPosts.length, 
+        hasNextPage: !!data.paging?.next 
+      });
       
       if (isLoadMore) {
         setPosts(prev => [...prev, ...newPosts]);
@@ -56,9 +47,9 @@ const FacebookFeed = ({
         setPosts(newPosts);
       }
       
-      // Handle pagination regardless of infinite scroll setting
-      if (data.paging?.cursors?.after) {
-        setNextPageToken(data.paging.cursors.after);
+      // Handle pagination using next URL
+      if (data.paging?.next) {
+        setNextPageToken(data.paging.next);
         setHasMore(true);
       } else {
         setNextPageToken(null);
@@ -73,16 +64,11 @@ const FacebookFeed = ({
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [pageId, PAGE_ACCESS_TOKEN, maxPosts, enableInfiniteScroll]);
+  }, [maxPosts]);
 
   useEffect(() => {
-    // Only fetch if we have a non-empty token
-    if (typeof PAGE_ACCESS_TOKEN === 'string' && PAGE_ACCESS_TOKEN.trim().length > 0) {
-      fetchFacebookPosts(false, null);
-    } else {
-      setLoading(false);
-      setError('Facebook API credentials not configured');
-    }
+    // Always attempt to fetch posts - let the service handle token validation
+    fetchFacebookPosts(false, null);
   }, [fetchFacebookPosts]);
 
   // Infinite scroll using IntersectionObserver

@@ -2,7 +2,7 @@
 // Fetch Facebook Page posts using Graph API with support for pagination (paging.next)
 
 const PAGE_ID = import.meta.env.VITE_FACEBOOK_PAGE_ID;
-const PAGE_TOKEN = import.meta.env.VITE_FACEBOOK_PAGE_TOKEN || import.meta.env.VITE_FACEBOOK_PAGE_ACCESS_TOKEN;
+const PAGE_TOKEN = import.meta.env.VITE_FACEBOOK_PAGE_ACCESS_TOKEN || import.meta.env.VITE_FACEBOOK_PAGE_TOKEN;
 
 const BASE_FIELDS = [
   'id',
@@ -15,7 +15,7 @@ const BASE_FIELDS = [
 ].join(',');
 
 function buildInitialUrl(limit = 6) {
-  const base = `https://graph.facebook.com/v23.0/${PAGE_ID}/posts`;
+  const base = `https://graph.facebook.com/v19.0/${PAGE_ID}/posts`;
   const params = new URLSearchParams({
     fields: BASE_FIELDS,
     access_token: PAGE_TOKEN,
@@ -26,8 +26,16 @@ function buildInitialUrl(limit = 6) {
 
 export async function getPagePosts({ nextUrl, limit = 6 } = {}) {
   try {
+    // Enhanced validation with detailed debugging
     if (!PAGE_ID || !PAGE_TOKEN) {
-      throw new Error('Missing VITE_FACEBOOK_PAGE_ID or VITE_FACEBOOK_PAGE_TOKEN in environment variables.');
+      console.error('❌ Facebook API Configuration Error:', {
+        hasPageId: !!PAGE_ID,
+        hasPageToken: !!PAGE_TOKEN,
+        pageId: PAGE_ID,
+        tokenLength: PAGE_TOKEN?.length || 0,
+        environment: import.meta.env.MODE
+      });
+      throw new Error('Missing VITE_FACEBOOK_PAGE_ID or VITE_FACEBOOK_PAGE_ACCESS_TOKEN in environment variables.');
     }
 
     let url = nextUrl || buildInitialUrl(limit);
@@ -44,7 +52,25 @@ export async function getPagePosts({ nextUrl, limit = 6 } = {}) {
       url += (url.includes('?') ? '&' : '?') + `access_token=${encodeURIComponent(PAGE_TOKEN)}`;
     }
 
-    const res = await fetch(url);
+    // Try both authentication methods for better compatibility
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        // Add Authorization header as backup (some environments prefer this)
+        'Authorization': `Bearer ${PAGE_TOKEN}`
+      }
+    };
+
+    console.log('🌐 Making Facebook API request:', {
+      url: url.replace(PAGE_TOKEN, 'TOKEN_HIDDEN'),
+      method: 'GET',
+      hasAuthHeader: !!requestOptions.headers.Authorization,
+      environment: import.meta.env.MODE
+    });
+
+    const res = await fetch(url, requestOptions);
     if (!res.ok) {
       const text = await res.text();
       let errorDetails;
@@ -64,12 +90,24 @@ export async function getPagePosts({ nextUrl, limit = 6 } = {}) {
       // Provide specific error messages for common issues
       let userMessage = `Facebook API error (${res.status})`;
       if (res.status === 400) {
-        userMessage = 'Invalid Facebook API request. Check your access token and page permissions.';
+        userMessage = 'Invalid Facebook API request. The access token may be expired, invalid, or lacks proper permissions. Please generate a new token.';
       } else if (res.status === 403) {
         userMessage = 'Access denied. Your Facebook token may have expired or lacks permissions.';
       } else if (res.status === 404) {
         userMessage = 'Facebook page not found. Check your page ID.';
+      } else if (res.status === 401) {
+        userMessage = 'Unauthorized. Your Facebook access token is invalid or expired.';
       }
+      
+      // Add detailed debugging for production issues
+      console.error('🔍 Debug Info:', {
+        originalUrl: url.replace(PAGE_TOKEN, 'TOKEN_HIDDEN'),
+        pageId: PAGE_ID,
+        tokenExists: !!PAGE_TOKEN,
+        tokenLength: PAGE_TOKEN?.length || 0,
+        environment: import.meta.env.MODE,
+        baseUrl: window.location.origin
+      });
       
       throw new Error(userMessage);
     }
