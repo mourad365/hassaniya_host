@@ -47,8 +47,31 @@ export async function getPagePosts({ nextUrl, limit = 6 } = {}) {
     const res = await fetch(url);
     if (!res.ok) {
       const text = await res.text();
-      console.error('Facebook API error:', res.status, text);
-      throw new Error(`Facebook API request failed with status ${res.status}`);
+      let errorDetails;
+      try {
+        errorDetails = JSON.parse(text);
+      } catch {
+        errorDetails = { message: text };
+      }
+      
+      console.error('Facebook API error:', {
+        status: res.status,
+        statusText: res.statusText,
+        url: url.replace(PAGE_TOKEN, 'TOKEN_HIDDEN'),
+        error: errorDetails
+      });
+      
+      // Provide specific error messages for common issues
+      let userMessage = `Facebook API error (${res.status})`;
+      if (res.status === 400) {
+        userMessage = 'Invalid Facebook API request. Check your access token and page permissions.';
+      } else if (res.status === 403) {
+        userMessage = 'Access denied. Your Facebook token may have expired or lacks permissions.';
+      } else if (res.status === 404) {
+        userMessage = 'Facebook page not found. Check your page ID.';
+      }
+      
+      throw new Error(userMessage);
     }
 
     const json = await res.json();

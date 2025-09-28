@@ -40,6 +40,7 @@ import ContentUploadPage from '@/pages/admin/ContentUploadPage';
 import ContactsPage from '@/pages/admin/ContactsPage';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
+import FacebookDebugger from '@/components/debug/FacebookDebugger';
 
 function App() {
   const { t } = useTranslation();
@@ -114,6 +115,7 @@ function App() {
                   <Route path="/opinion" element={<OpinionPage />} />
                   <Route path="/facebook" element={<FacebookPage />} />
                   <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/debug/facebook" element={<FacebookDebugger />} />
                 </Routes>
               </main>
               <Footer />
