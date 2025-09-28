@@ -1,9 +1,10 @@
-# 🚨 URGENT: Facebook API CSP Fix
+# 🚨 URGENT: Facebook API CSP & CORS Fix
 
-## Problem Identified
-Your Content Security Policy (CSP) was blocking Facebook Graph API requests. The error showed:
-- CSP denied connection to `https://graph.facebook.com`
-- Facebook access token showing as placeholder `your_production_facebook_page_access_token`
+## Problems Identified
+1. **CSP blocking Facebook Graph API** - `connect-src` didn't include `graph.facebook.com`
+2. **CSP blocking Vercel.live frame** - `frame-src` didn't include `vercel.live`
+3. **Facebook CORS blocking Authorization header** - Facebook doesn't allow `Authorization` header in CORS requests
+4. **Environment variable not set** - Token shows as placeholder in production
 
 ## ✅ Fixes Applied
 
@@ -12,18 +13,16 @@ Your Content Security Policy (CSP) was blocking Facebook Graph API requests. The
 - `public/_headers` (for Netlify)
 - `vercel.json` (for Vercel)
 
+**Changes Made:**
+- Added `https://graph.facebook.com https://*.facebook.com` to `connect-src`
+- Added `https://vercel.live` to `frame-src`
+
+### 2. Fixed Facebook CORS Issue
+**File Updated:** `src/services/facebookService.js`
+
 **Change Made:**
-Added `https://graph.facebook.com https://*.facebook.com` to the `connect-src` directive.
-
-**Before:**
-```
-connect-src 'self' https://api.supabase.co https://*.supabase.co https://*.b-cdn.net https://vercel.live
-```
-
-**After:**
-```
-connect-src 'self' https://api.supabase.co https://*.supabase.co https://*.b-cdn.net https://vercel.live https://graph.facebook.com https://*.facebook.com
-```
+- Removed `Authorization: Bearer` header (Facebook CORS blocks it)
+- Use only `access_token` query parameter (CORS-safe)
 
 ## 🚀 Immediate Action Required
 

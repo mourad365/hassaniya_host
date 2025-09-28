@@ -32,7 +32,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.supabase.co https://*.supabase.co https://*.b-cdn.net https://vercel.live https://graph.facebook.com https://*.facebook.com; media-src 'self' https://*.b-cdn.net blob:; frame-src 'self' https://iframe.mediadelivery.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.supabase.co https://*.supabase.co https://*.b-cdn.net https://vercel.live https://graph.facebook.com https://*.facebook.com; media-src 'self' https://*.b-cdn.net blob:; frame-src 'self' https://iframe.mediadelivery.net https://vercel.live; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
         }
       ]
     },

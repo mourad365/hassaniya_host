@@ -52,25 +52,16 @@ export async function getPagePosts({ nextUrl, limit = 6 } = {}) {
       url += (url.includes('?') ? '&' : '?') + `access_token=${encodeURIComponent(PAGE_TOKEN)}`;
     }
 
-    // Try both authentication methods for better compatibility
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        // Add Authorization header as backup (some environments prefer this)
-        'Authorization': `Bearer ${PAGE_TOKEN}`
-      }
-    };
-
+    // Facebook Graph API only supports access_token as query parameter for CORS requests
+    // DO NOT use Authorization header - Facebook CORS policy blocks it
     console.log('🌐 Making Facebook API request:', {
       url: url.replace(PAGE_TOKEN, 'TOKEN_HIDDEN'),
       method: 'GET',
-      hasAuthHeader: !!requestOptions.headers.Authorization,
+      authMethod: 'query_parameter',
       environment: import.meta.env.MODE
     });
 
-    const res = await fetch(url, requestOptions);
+    const res = await fetch(url);
     if (!res.ok) {
       const text = await res.text();
       let errorDetails;
