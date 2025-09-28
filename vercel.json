@@ -32,7 +32,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.supabase.co https://*.supabase.co https://*.b-cdn.net; media-src 'self' https://*.b-cdn.net blob:; frame-src 'self' https://iframe.mediadelivery.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.supabase.co https://*.supabase.co https://*.b-cdn.net https://vercel.live; media-src 'self' https://*.b-cdn.net blob:; frame-src 'self' https://iframe.mediadelivery.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
         }
       ]
     },
@@ -64,5 +64,13 @@
   "env": {
     "NODE_ENV": "production",
     "VITE_APP_ENV": "production"
+  },
+  "functions": {
+    "app/api/feedback.js": {
+      "runtime": "@vercel/node@2"
+    }
+  },
+  "github": {
+    "silent": true
   }
 }
